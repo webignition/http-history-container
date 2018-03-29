@@ -6,7 +6,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
-class Container implements \ArrayAccess
+class Container implements ContainerInterface, \ArrayAccess
 {
     const KEY_REQUEST = 'request';
     const KEY_RESPONSE = 'response';
