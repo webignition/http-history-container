@@ -1,0 +1,42 @@
+{
+    "name": "webignition/http-history-container",
+    "description": "A container for Guzzle history middleware",
+    "keywords": ["guzzle", "guzzlehttp", "history", "container", "middleware", "psr-7"],
+    "homepage": "https://github.com/webignition/http-history-container",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jon Cram",
+            "email": "jon@webignition.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "webignition\\HttpHistoryContainer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "webignition\\HttpHistoryContainer\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --colors=always",
+        "cs": "./vendor/bin/phpcs src tests --colors --standard=PSR2",
+        "ci": [
+            "@composer cs",
+            "@composer test"
+        ]
+    },
+    "require": {
+      "php": ">=5.6.0",
+      "psr/http-message": "^1"
+    },
+    "require-dev": {
+      "phpunit/phpunit": "^5.0",
+      "squizlabs/php_codesniffer": "^3",
+      "mockery/mockery": "^1.0"
+    },
+    "minimum-stability":"stable"
+}
