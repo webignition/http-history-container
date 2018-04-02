@@ -99,7 +99,7 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * @return UriInterface[]
+     * {@inheritdoc}
      */
     public function getRequestUrls()
     {
@@ -114,7 +114,7 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
     public function getRequestUrlsAsStrings()
     {
@@ -129,21 +129,15 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * @return RequestInterface
+     * {@inheritdoc}
      */
     public function getLastRequest()
     {
-        $requests = $this->getRequests();
-
-        if (empty($requests)) {
-            return null;
-        }
-
-        return array_pop($requests);
+        return $this->getLastArrayValue($this->getRequests());
     }
 
     /**
-     * @return UriInterface
+     * {@inheritdoc}
      */
     public function getLastRequestUrl()
     {
@@ -154,6 +148,28 @@ class Container implements ContainerInterface, \ArrayAccess
         }
 
         return $lastRequest->getUri();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastResponse()
+    {
+        return $this->getLastArrayValue($this->getResponses());
+    }
+
+    /**
+     * @param array $items
+     *
+     * @return mixed|null
+     */
+    private function getLastArrayValue(array $items)
+    {
+        if (empty($items)) {
+            return null;
+        }
+
+        return array_pop($items);
     }
 
     /**
