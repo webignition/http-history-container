@@ -515,7 +515,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             'response not a ResponseInterface' => [
                 'value' => [
                     Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                    Container::KEY_RESPONSE => null,
+                    Container::KEY_RESPONSE => new \stdClass(),
                     Container::KEY_ERROR => null,
                     Container::KEY_OPTIONS => null,
                 ],
@@ -550,5 +550,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->container[] = $value1;
 
         $this->assertEquals($value1Response, $this->container->getLastResponse());
+    }
+
+    public function testRequestCanBeNull()
+    {
+        $value = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => null,
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $this->container[] = $value;
+
+        $this->assertEquals($value, $this->container[0]);
     }
 }

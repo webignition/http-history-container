@@ -4,7 +4,6 @@ namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 
 class Container implements ContainerInterface, \ArrayAccess
 {
@@ -220,7 +219,9 @@ class Container implements ContainerInterface, \ArrayAccess
             );
         }
 
-        if (!$value[self::KEY_RESPONSE] instanceof ResponseInterface) {
+        $response = $value[self::KEY_RESPONSE];
+
+        if (!empty($response) && !$response instanceof ResponseInterface) {
             throw new \InvalidArgumentException(
                 self::VALUE_RESPONSE_NOT_RESPONSE_MESSAGE,
                 self::VALUE_RESPONSE_NOT_RESPONSE_CODE
