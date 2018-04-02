@@ -39,43 +39,46 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider invalidValueDataProvider
+     * @dataProvider invalidHttpTransactionDataProvider
      *
-     * @param mixed $value
+     * @param mixed $httpTransaction
      * @param string $expectedExceptionMessage
      * @param int $expectedExceptionCode
      */
-    public function testOffsetSetInvalidValue($value, $expectedExceptionMessage, $expectedExceptionCode)
-    {
+    public function testOffsetSetInvalidHttpTransaction(
+        $httpTransaction,
+        $expectedExceptionMessage,
+        $expectedExceptionCode
+    ) {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->expectExceptionCode($expectedExceptionCode);
 
-        $this->container->offsetSet(null, $value);
+        $this->container->offsetSet(null, $httpTransaction);
     }
 
     /**
      * @dataProvider arrayAccessOffsetSetOffsetGetDataProvider
      *
-     * @param array $existingValues
+     * @param array $existingHttpTransactions
      * @param mixed $offsetSetOffset
-     * @param array $offsetSetValue
+     * @param array $offsetSetHttpTransaction
      * @param mixed $offsetGetOffset
-     * @param array $expectedValue
+     * @param array $expectedHttpTransaction
      */
     public function testArrayAccessOffsetSetOffsetGet(
-        array $existingValues,
+        array $existingHttpTransactions,
         $offsetSetOffset,
-        $offsetSetValue,
+        $offsetSetHttpTransaction,
         $offsetGetOffset,
-        $expectedValue
+        $expectedHttpTransaction
     ) {
-        foreach ($existingValues as $existingOffset => $existingValue) {
-            $this->container->offsetSet($existingOffset, $existingValue);
+        foreach ($existingHttpTransactions as $existingOffset => $existingTransaction) {
+            $this->container->offsetSet($existingOffset, $existingTransaction);
         }
 
-        $this->container->offsetSet($offsetSetOffset, $offsetSetValue);
-        $this->assertEquals($expectedValue, $this->container->offsetGet($offsetGetOffset));
+        $this->container->offsetSet($offsetSetOffset, $offsetSetHttpTransaction);
+        $this->assertEquals($expectedHttpTransaction, $this->container->offsetGet($offsetGetOffset));
     }
 
     /**
@@ -83,7 +86,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function arrayAccessOffsetSetOffsetGetDataProvider()
     {
-        $value0 = [
+        $httpTransaction0 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
@@ -92,7 +95,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $value1 = [
+        $httpTransaction1 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
@@ -101,108 +104,108 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $existingValues = [
-            $value0,
+        $existingHttpTransactions = [
+            $httpTransaction0,
         ];
 
         return [
             'no existing values; offsetSetOffset=null, offsetGetOffset=null' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => null,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=null, offsetGetOffset=0' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => 0,
-                'expectedValue' => $value0,
+                'expectedHttpTransaction' => $httpTransaction0,
             ],
             'no existing values; offsetSetOffset=null, offsetGetOffset=1' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => 1,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=null' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => null,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=0' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => 0,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=1' => [
-                'existingValues' => [],
+                'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value0,
+                'offsetSetHttpTransaction' => $httpTransaction0,
                 'offsetGetOffset' => 1,
-                'expectedValue' => $value0,
+                'expectedHttpTransaction' => $httpTransaction0,
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=null' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => null,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=0' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => 0,
-                'expectedValue' => $value0,
+                'expectedHttpTransaction' => $httpTransaction0,
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=1' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => 1,
-                'expectedValue' => $value1,
+                'expectedHttpTransaction' => $httpTransaction1,
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=null' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => null,
-                'expectedValue' => null,
+                'expectedHttpTransaction' => null,
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=0' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => 0,
-                'expectedValue' => $value0,
+                'expectedHttpTransaction' => $httpTransaction0,
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=1' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => 1,
-                'expectedValue' => $value1,
+                'expectedHttpTransaction' => $httpTransaction1,
             ],
             'has existing values; offsetSetOffset=0, offsetGetOffset=0' => [
-                'existingValues' => $existingValues,
+                'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 0,
-                'offsetSetValue' => $value1,
+                'offsetSetHttpTransaction' => $httpTransaction1,
                 'offsetGetOffset' => 0,
-                'expectedValue' => $value1,
+                'expectedHttpTransaction' => $httpTransaction1,
             ],
         ];
     }
 
     public function testArrayAccessOffsetExistsOffsetUnset()
     {
-        $value = [
+        $httpTransaction = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
@@ -211,7 +214,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->container->offsetExists(0));
 
-        $this->container->offsetSet(0, $value);
+        $this->container->offsetSet(0, $httpTransaction);
         $this->assertTrue($this->container->offsetExists(0));
 
         $this->container->offsetUnset(0);
@@ -220,18 +223,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequests()
     {
-        $value0Request = \Mockery::mock(RequestInterface::class);
-        $value1Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
 
-        $value0 = [
-            Container::KEY_REQUEST => $value0Request,
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => $httpTransaction0Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
-            Container::KEY_REQUEST => $value1Request,
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => $httpTransaction1Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
@@ -239,13 +242,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($this->container->getRequests());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
         $this->assertEquals(
             [
-                $value0Request,
-                $value1Request,
+                $httpTransaction0Request,
+                $httpTransaction1Request,
             ],
             $this->container->getRequests()
         );
@@ -253,32 +256,32 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetResponses()
     {
-        $value0Response = \Mockery::mock(ResponseInterface::class);
-        $value1Response = \Mockery::mock(ResponseInterface::class);
+        $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
+        $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
-        $value0 = [
+        $httpTransaction0 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $value0Response,
+            Container::KEY_RESPONSE => $httpTransaction0Response,
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
+        $httpTransaction1 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $value1Response,
+            Container::KEY_RESPONSE => $httpTransaction1Response,
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
         $this->assertEmpty($this->container->getResponses());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
         $this->assertEquals(
             [
-                $value0Response,
-                $value1Response,
+                $httpTransaction0Response,
+                $httpTransaction1Response,
             ],
             $this->container->getResponses()
         );
@@ -286,35 +289,35 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequestUrls()
     {
-        $value0RequestUri = \Mockery::mock(UriInterface::class);
-        $value0RequestUri
+        $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
+        $httpTransaction0RequestUri
             ->shouldReceive('__toString')
             ->andReturn('http://example.com/0/');
 
-        $value1RequestUri = \Mockery::mock(UriInterface::class);
-        $value1RequestUri
+        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
+        $httpTransaction1RequestUri
             ->shouldReceive('__toString')
             ->andReturn('http://example.com/1/');
 
-        $value0Request = \Mockery::mock(RequestInterface::class);
-        $value0Request
+        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction0Request
             ->shouldReceive('getUri')
-            ->andReturn($value0RequestUri);
+            ->andReturn($httpTransaction0RequestUri);
 
-        $value1Request = \Mockery::mock(RequestInterface::class);
-        $value1Request
+        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction1Request
             ->shouldReceive('getUri')
-            ->andReturn($value1RequestUri);
+            ->andReturn($httpTransaction1RequestUri);
 
-        $value0 = [
-            Container::KEY_REQUEST => $value0Request,
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => $httpTransaction0Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
-            Container::KEY_REQUEST => $value1Request,
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => $httpTransaction1Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
@@ -322,13 +325,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($this->container->getRequestUrls());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
         $this->assertEquals(
             [
-                $value0RequestUri,
-                $value1RequestUri,
+                $httpTransaction0RequestUri,
+                $httpTransaction1RequestUri,
             ],
             $this->container->getRequestUrls()
         );
@@ -336,35 +339,35 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequestUrlsAsStrings()
     {
-        $value0RequestUri = \Mockery::mock(UriInterface::class);
-        $value0RequestUri
+        $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
+        $httpTransaction0RequestUri
             ->shouldReceive('__toString')
             ->andReturn('http://example.com/0/');
 
-        $value1RequestUri = \Mockery::mock(UriInterface::class);
-        $value1RequestUri
+        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
+        $httpTransaction1RequestUri
             ->shouldReceive('__toString')
             ->andReturn('http://example.com/1/');
 
-        $value0Request = \Mockery::mock(RequestInterface::class);
-        $value0Request
+        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction0Request
             ->shouldReceive('getUri')
-            ->andReturn($value0RequestUri);
+            ->andReturn($httpTransaction0RequestUri);
 
-        $value1Request = \Mockery::mock(RequestInterface::class);
-        $value1Request
+        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction1Request
             ->shouldReceive('getUri')
-            ->andReturn($value1RequestUri);
+            ->andReturn($httpTransaction1RequestUri);
 
-        $value0 = [
-            Container::KEY_REQUEST => $value0Request,
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => $httpTransaction0Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
-            Container::KEY_REQUEST => $value1Request,
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => $httpTransaction1Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
@@ -372,8 +375,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($this->container->getRequestUrlsAsStrings());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
         $this->assertEquals(
             [
@@ -386,18 +389,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLastRequest()
     {
-        $value0Request = \Mockery::mock(RequestInterface::class);
-        $value1Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
 
-        $value0 = [
-            Container::KEY_REQUEST => $value0Request,
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => $httpTransaction0Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
-            Container::KEY_REQUEST => $value1Request,
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => $httpTransaction1Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
@@ -405,35 +408,35 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($this->container->getLastRequest());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
-        $this->assertEquals($value1Request, $this->container->getLastRequest());
+        $this->assertEquals($httpTransaction1Request, $this->container->getLastRequest());
     }
 
     public function testGetLastRequestUrl()
     {
-        $value1RequestUri = \Mockery::mock(UriInterface::class);
-        $value1RequestUri
+        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
+        $httpTransaction1RequestUri
             ->shouldReceive('__toString')
             ->andReturn('http://example.com/1/');
 
-        $value0Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
 
-        $value1Request = \Mockery::mock(RequestInterface::class);
-        $value1Request
+        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
+        $httpTransaction1Request
             ->shouldReceive('getUri')
-            ->andReturn($value1RequestUri);
+            ->andReturn($httpTransaction1RequestUri);
 
-        $value0 = [
-            Container::KEY_REQUEST => $value0Request,
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => $httpTransaction0Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
-            Container::KEY_REQUEST => $value1Request,
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => $httpTransaction1Request,
             Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
@@ -441,10 +444,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($this->container->getLastRequestUrl());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
-        $this->assertEquals($value1RequestUri, $this->container->getLastRequestUrl());
+        $this->assertEquals($httpTransaction1RequestUri, $this->container->getLastRequestUrl());
     }
 
     /**
@@ -465,28 +468,28 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function invalidValueDataProvider()
+    public function invalidHttpTransactionDataProvider()
     {
         return [
             'not an array' => [
-                'value' => null,
+                'httpTransaction' => null,
                 'expectedExceptionMessage' => Container::VALUE_NOT_ARRAY_MESSAGE,
                 'expectedExceptionCode' => Container::VALUE_NOT_ARRAY_CODE,
             ],
             'missing request key' => [
-                'value' => [],
+                'httpTransaction' => [],
                 'expectedExceptionMessage' => 'Key "request" must be present',
                 'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
             ],
             'missing response key' => [
-                'value' => [
+                'httpTransaction' => [
                     Container::KEY_REQUEST => null,
                 ],
                 'expectedExceptionMessage' => 'Key "response" must be present',
                 'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
             ],
             'missing error key' => [
-                'value' => [
+                'httpTransaction' => [
                     Container::KEY_REQUEST => null,
                     Container::KEY_RESPONSE => null,
                 ],
@@ -494,7 +497,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
             ],
             'missing options key' => [
-                'value' => [
+                'httpTransaction' => [
                     Container::KEY_REQUEST => null,
                     Container::KEY_RESPONSE => null,
                     Container::KEY_ERROR => null,
@@ -503,7 +506,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
             ],
             'request not a RequestInterface' => [
-                'value' => [
+                'httpTransaction' => [
                     Container::KEY_REQUEST => null,
                     Container::KEY_RESPONSE => null,
                     Container::KEY_ERROR => null,
@@ -513,7 +516,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 'expectedExceptionCode' => Container::VALUE_REQUEST_NOT_REQUEST_CODE,
             ],
             'response not a ResponseInterface' => [
-                'value' => [
+                'httpTransaction' => [
                     Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
                     Container::KEY_RESPONSE => new \stdClass(),
                     Container::KEY_ERROR => null,
@@ -527,42 +530,42 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLastResponse()
     {
-        $value0Response = \Mockery::mock(ResponseInterface::class);
-        $value1Response = \Mockery::mock(ResponseInterface::class);
+        $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
+        $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
-        $value0 = [
+        $httpTransaction0 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $value0Response,
+            Container::KEY_RESPONSE => $httpTransaction0Response,
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $value1 = [
+        $httpTransaction1 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $value1Response,
+            Container::KEY_RESPONSE => $httpTransaction1Response,
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
         $this->assertEmpty($this->container->getLastResponse());
 
-        $this->container[] = $value0;
-        $this->container[] = $value1;
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
 
-        $this->assertEquals($value1Response, $this->container->getLastResponse());
+        $this->assertEquals($httpTransaction1Response, $this->container->getLastResponse());
     }
 
     public function testRequestCanBeNull()
     {
-        $value = [
+        $httpTransaction = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
             Container::KEY_RESPONSE => null,
             Container::KEY_ERROR => null,
             Container::KEY_OPTIONS => []
         ];
 
-        $this->container[] = $value;
+        $this->container[] = $httpTransaction;
 
-        $this->assertEquals($value, $this->container[0]);
+        $this->assertEquals($httpTransaction, $this->container[0]);
     }
 }
