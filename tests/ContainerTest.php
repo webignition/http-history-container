@@ -524,4 +524,31 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    public function testGetLastResponse()
+    {
+        $value0Response = \Mockery::mock(ResponseInterface::class);
+        $value1Response = \Mockery::mock(ResponseInterface::class);
+
+        $value0 = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => $value0Response,
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $value1 = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => $value1Response,
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $this->assertEmpty($this->container->getLastResponse());
+
+        $this->container[] = $value0;
+        $this->container[] = $value1;
+
+        $this->assertEquals($value1Response, $this->container->getLastResponse());
+    }
 }

@@ -59,5 +59,10 @@ interface ContainerInterface
      * @return UriInterface
      */
     public function getLastRequestUrl();
+
+    /**
+     * @return ResponseInterface
+     */
+    public function getLastResponse();
 }
 ```
