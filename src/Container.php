@@ -4,7 +4,6 @@ namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 
 class Container implements ContainerInterface, \ArrayAccess
 {
@@ -16,13 +15,13 @@ class Container implements ContainerInterface, \ArrayAccess
     const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
     const OFFSET_INVALID_CODE = 1;
 
-    const VALUE_NOT_ARRAY_MESSAGE = 'Value must be an array';
+    const VALUE_NOT_ARRAY_MESSAGE = 'HTTP transaction must be an array';
     const VALUE_NOT_ARRAY_CODE = 2;
     const VALUE_MISSING_KEY_MESSAGE = 'Key "%s" must be present';
     const VALUE_MISSING_KEY_CODE = 3;
-    const VALUE_REQUEST_NOT_REQUEST_MESSAGE = 'Value[\'request\'] must implement ' . RequestInterface::class;
+    const VALUE_REQUEST_NOT_REQUEST_MESSAGE = 'Transaction[\'request\'] must implement ' . RequestInterface::class;
     const VALUE_REQUEST_NOT_REQUEST_CODE = 4;
-    const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE = 'Value[\'response\'] must implement ' . ResponseInterface::class;
+    const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE = 'Transaction[\'response\'] must implement ' . ResponseInterface::class;
     const VALUE_RESPONSE_NOT_RESPONSE_CODE = 5;
 
     /**
@@ -32,17 +31,17 @@ class Container implements ContainerInterface, \ArrayAccess
 
     /**
      * @param mixed $offset
-     * @param array $value
+     * @param array $httpTransaction
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $httpTransaction)
     {
         $this->validateOffset($offset);
-        $this->validateValue($value);
+        $this->validateHttpTransaction($httpTransaction);
 
         if (is_null($offset)) {
-            $this->container[] = $value;
+            $this->container[] = $httpTransaction;
         } else {
-            $this->container[$offset] = $value;
+            $this->container[$offset] = $httpTransaction;
         }
     }
 
@@ -186,11 +185,11 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * @param mixed $value
+     * @param array $httpTransaction
      */
-    private function validateValue($value)
+    private function validateHttpTransaction($httpTransaction)
     {
-        if (!is_array($value)) {
+        if (!is_array($httpTransaction)) {
             throw new \InvalidArgumentException(
                 self::VALUE_NOT_ARRAY_MESSAGE,
                 self::VALUE_NOT_ARRAY_CODE
@@ -205,7 +204,7 @@ class Container implements ContainerInterface, \ArrayAccess
         ];
 
         foreach ($requiredKeys as $requiredKey) {
-            if (!array_key_exists($requiredKey, $value)) {
+            if (!array_key_exists($requiredKey, $httpTransaction)) {
                 throw new \InvalidArgumentException(
                     sprintf(self::VALUE_MISSING_KEY_MESSAGE, $requiredKey),
                     self::VALUE_MISSING_KEY_CODE
@@ -213,14 +212,16 @@ class Container implements ContainerInterface, \ArrayAccess
             }
         }
 
-        if (!$value[self::KEY_REQUEST] instanceof RequestInterface) {
+        if (!$httpTransaction[self::KEY_REQUEST] instanceof RequestInterface) {
             throw new \InvalidArgumentException(
                 self::VALUE_REQUEST_NOT_REQUEST_MESSAGE,
                 self::VALUE_REQUEST_NOT_REQUEST_CODE
             );
         }
 
-        if (!$value[self::KEY_RESPONSE] instanceof ResponseInterface) {
+        $response = $httpTransaction[self::KEY_RESPONSE];
+
+        if (!empty($response) && !$response instanceof ResponseInterface) {
             throw new \InvalidArgumentException(
                 self::VALUE_RESPONSE_NOT_RESPONSE_MESSAGE,
                 self::VALUE_RESPONSE_NOT_RESPONSE_CODE
