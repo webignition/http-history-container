@@ -568,4 +568,41 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($httpTransaction, $this->container[0]);
     }
+
+    public function testIterator()
+    {
+        $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
+        $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
+
+        $httpTransaction0 = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => $httpTransaction0Response,
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $httpTransaction1 = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => $httpTransaction1Response,
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $httpTransactions = [
+            $httpTransaction0,
+            $httpTransaction1,
+        ];
+
+        $this->container[] = $httpTransaction0;
+        $this->container[] = $httpTransaction1;
+
+        $iteratedTransactionCount = 0;
+
+        foreach ($this->container as $httpTransactionIndex => $httpTransaction) {
+            $iteratedTransactionCount++;
+            $this->assertEquals($httpTransactions[$httpTransactionIndex], $httpTransaction);
+        }
+
+        $this->assertEquals(2, $iteratedTransactionCount);
+    }
 }
