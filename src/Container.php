@@ -5,7 +5,7 @@ namespace webignition\HttpHistoryContainer;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Container implements ContainerInterface, \ArrayAccess
+class Container implements ContainerInterface, \ArrayAccess, \Iterator
 {
     const KEY_REQUEST = 'request';
     const KEY_RESPONSE = 'response';
@@ -28,6 +28,11 @@ class Container implements ContainerInterface, \ArrayAccess
      * @var array
      */
     private $container = [];
+
+    /**
+     * @var int
+     */
+    private $iteratorIndex = 0;
 
     /**
      * @param mixed $offset
@@ -67,6 +72,46 @@ class Container implements ContainerInterface, \ArrayAccess
     public function offsetGet($offset)
     {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        $this->iteratorIndex = 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function current()
+    {
+        return $this->container[$this->iteratorIndex];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return $this->iteratorIndex;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next()
+    {
+        ++$this->iteratorIndex;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid()
+    {
+        return isset($this->container[$this->iteratorIndex]);
     }
 
     /**
