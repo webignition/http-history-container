@@ -605,4 +605,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, $iteratedTransactionCount);
     }
+
+    public function testClear()
+    {
+        $httpTransaction = [
+            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            Container::KEY_ERROR => null,
+            Container::KEY_OPTIONS => []
+        ];
+
+        $this->container[] = $httpTransaction;
+        $this->assertCount(1, $this->container);
+
+        $this->container->clear();
+        $this->assertCount(0, $this->container);
+    }
 }

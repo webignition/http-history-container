@@ -5,7 +5,7 @@ namespace webignition\HttpHistoryContainer;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Container implements ContainerInterface, \ArrayAccess, \Iterator
+class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countable
 {
     const KEY_REQUEST = 'request';
     const KEY_RESPONSE = 'response';
@@ -200,6 +200,20 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
     public function getLastResponse()
     {
         return $this->getLastArrayValue($this->getResponses());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count()
+    {
+        return count($this->container);
+    }
+
+    public function clear()
+    {
+        $this->container = [];
+        $this->iteratorIndex = 0;
     }
 
     /**
