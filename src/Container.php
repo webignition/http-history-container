@@ -35,6 +35,11 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
      */
     private $iteratorIndex = 0;
 
+    public function getTransactions(): array
+    {
+        return $this->container;
+    }
+
     /**
      * @param mixed $offset
      * @param array $httpTransaction

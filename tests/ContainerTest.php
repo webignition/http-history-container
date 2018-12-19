@@ -874,6 +874,11 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testGetTransactions()
+    {
+        $this->assertEquals([], $this->container->getTransactions());
+    }
+
     private function createResponse(int $statusCode): ResponseInterface
     {
         $response = \Mockery::mock(ResponseInterface::class);
