@@ -63,7 +63,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
 
     public function offsetGet($offset)
     {
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+        return $this->container[$offset] ?? null;
     }
 
     public function rewind()
