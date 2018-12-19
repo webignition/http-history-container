@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace webignition\HttpHistoryContainer\Tests;
 
@@ -611,5 +612,295 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
 
         $this->container->clear();
         $this->assertCount(0, $this->container);
+    }
+
+    /**
+     * @dataProvider hasRedirectLoopDataProvider
+     */
+    public function testHasRedirectLoop(array $httpTransactions, bool $expectedHasRedirectLoop)
+    {
+        foreach ($httpTransactions as $httpTransaction) {
+            $this->container[] = $httpTransaction;
+        }
+
+        $this->assertEquals($expectedHasRedirectLoop, $this->container->hasRedirectLoop());
+    }
+
+    public function hasRedirectLoopDataProvider(): array
+    {
+        return [
+            'single 200 response' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        Container::KEY_RESPONSE => $this->createResponse(200),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => false,
+            ],
+            'contains non-redirect response (200)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        Container::KEY_RESPONSE => $this->createResponse(200),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => false,
+            ],
+            'contains non-redirect response (404)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        Container::KEY_RESPONSE => $this->createResponse(404),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => false,
+            ],
+            'only redirects, no loop (all different)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => false,
+            ],
+            'method change within apparent loop is not loop' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => false,
+            ],
+            'redirecting directly back to self' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => true,
+            ],
+            'redirecting indirectly back to self' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => true,
+            ],
+            'redirecting indirectly back to self (with method group change)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => true,
+            ],
+            'redirecting indirectly back to self(with method group change, loop in first group only)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/2'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => true,
+            ],
+            'redirecting indirectly back to self(with method group change, loop in second group only)' => [
+                'httpTransactions' => [
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/2'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                    [
+                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        Container::KEY_RESPONSE => $this->createResponse(301),
+                        Container::KEY_ERROR => null,
+                        Container::KEY_OPTIONS => []
+                    ],
+                ],
+                'expectedHasRedirectLoop' => true,
+            ],
+        ];
+    }
+
+    private function createResponse(int $statusCode): ResponseInterface
+    {
+        $response = \Mockery::mock(ResponseInterface::class);
+        $response
+            ->shouldReceive('getStatusCode')
+            ->andReturn($statusCode);
+
+        return $response;
+    }
+
+    private function createRequest(string $method, string $url): RequestInterface
+    {
+        $uri = \Mockery::mock(UriInterface::class);
+        $uri
+            ->shouldReceive('__toString')
+            ->andReturn($url);
+
+        $request = \Mockery::mock(RequestInterface::class);
+
+        $request
+            ->shouldReceive('getMethod')
+            ->andReturn($method);
+
+        $request
+            ->shouldReceive('getUri')
+            ->andReturn($uri);
+
+        return $request;
     }
 }
