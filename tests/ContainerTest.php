@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Container;
 
-class ContainerTest extends \PHPUnit_Framework_TestCase
+class ContainerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Container
@@ -47,8 +47,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOffsetSetInvalidHttpTransaction(
         $httpTransaction,
-        $expectedExceptionMessage,
-        $expectedExceptionCode
+        string $expectedExceptionMessage,
+        int $expectedExceptionCode
     ) {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -69,9 +69,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testArrayAccessOffsetSetOffsetGet(
         array $existingHttpTransactions,
         $offsetSetOffset,
-        $offsetSetHttpTransaction,
+        array $offsetSetHttpTransaction,
         $offsetGetOffset,
-        $expectedHttpTransaction
+        ?array $expectedHttpTransaction
     ) {
         foreach ($existingHttpTransactions as $existingOffset => $existingTransaction) {
             $this->container->offsetSet($existingOffset, $existingTransaction);
@@ -81,10 +81,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedHttpTransaction, $this->container->offsetGet($offsetGetOffset));
     }
 
-    /**
-     * @return array
-     */
-    public function arrayAccessOffsetSetOffsetGetDataProvider()
+    public function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {
         $httpTransaction0 = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -450,10 +447,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($httpTransaction1RequestUri, $this->container->getLastRequestUrl());
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOffsetDataProvider()
+    public function invalidOffsetDataProvider(): array
     {
         return [
             'bool' => [
@@ -465,10 +459,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function invalidHttpTransactionDataProvider()
+    public function invalidHttpTransactionDataProvider(): array
     {
         return [
             'not an array' => [

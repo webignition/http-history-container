@@ -4,6 +4,7 @@ namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
 class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countable
 {
@@ -50,74 +51,47 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->container[$offset]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function offsetUnset($offset)
     {
         unset($this->container[$offset]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function offsetGet($offset)
     {
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+        return $this->container[$offset] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rewind()
     {
         $this->iteratorIndex = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function current()
     {
         return $this->container[$this->iteratorIndex];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
+    public function key(): int
     {
         return $this->iteratorIndex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next()
     {
         ++$this->iteratorIndex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->container[$this->iteratorIndex]);
     }
 
-    /**
-     * @return RequestInterface[]
-     */
-    public function getRequests()
+    public function getRequests(): array
     {
         $requests = [];
 
@@ -128,10 +102,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         return $requests;
     }
 
-    /**
-     * @return ResponseInterface[]
-     */
-    public function getResponses()
+    public function getResponses(): array
     {
         $responses = [];
 
@@ -142,10 +113,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         return $responses;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequestUrls()
+    public function getRequestUrls(): array
     {
         $requestUrls = [];
 
@@ -157,10 +125,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         return $requestUrls;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequestUrlsAsStrings()
+    public function getRequestUrlsAsStrings(): array
     {
         /* @var string[] $requestUrls */
         $requestUrls = $this->getRequestUrls();
@@ -172,18 +137,12 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         return $requestUrls;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastRequest()
+    public function getLastRequest(): ?RequestInterface
     {
         return $this->getLastArrayValue($this->getRequests());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastRequestUrl()
+    public function getLastRequestUrl(): ?UriInterface
     {
         $lastRequest = $this->getLastRequest();
 
@@ -194,18 +153,12 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator, \Countab
         return $lastRequest->getUri();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastResponse()
+    public function getLastResponse(): ?ResponseInterface
     {
         return $this->getLastArrayValue($this->getResponses());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
+    public function count(): int
     {
         return count($this->container);
     }

@@ -11,35 +11,24 @@ interface ContainerInterface
     /**
      * @return RequestInterface[]
      */
-    public function getRequests();
+    public function getRequests(): array;
 
     /**
      * @return ResponseInterface[]
      */
-    public function getResponses();
+    public function getResponses(): array;
 
     /**
      * @return UriInterface[]
      */
-    public function getRequestUrls();
+    public function getRequestUrls(): array;
 
     /**
      * @return string[]
      */
-    public function getRequestUrlsAsStrings();
+    public function getRequestUrlsAsStrings(): array;
 
-    /**
-     * @return RequestInterface
-     */
-    public function getLastRequest();
-
-    /**
-     * @return UriInterface
-     */
-    public function getLastRequestUrl();
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getLastResponse();
+    public function getLastRequest(): ?RequestInterface;
+    public function getLastRequestUrl(): ?UriInterface;
+    public function getLastResponse(): ?ResponseInterface;
 }
