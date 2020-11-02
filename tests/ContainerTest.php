@@ -1,24 +1,23 @@
 <?php
-/** @noinspection PhpDocSignatureInspection */
+
+declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Container;
 
-class ContainerTest extends \PHPUnit\Framework\TestCase
+class ContainerTest extends TestCase
 {
     /**
      * @var Container
      */
-    private $container;
+    private Container $container;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +29,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
      *
      * @param mixed $offset
      */
-    public function testOffsetSetInvalidOffset($offset)
+    public function testOffsetSetInvalidOffset($offset):  void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(Container::OFFSET_INVALID_MESSAGE);
@@ -50,7 +49,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $httpTransaction,
         string $expectedExceptionMessage,
         int $expectedExceptionCode
-    ) {
+    ): void {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->expectExceptionCode($expectedExceptionCode);
@@ -65,7 +64,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
      * @param mixed $offsetSetOffset
      * @param array $offsetSetHttpTransaction
      * @param mixed $offsetGetOffset
-     * @param array $expectedHttpTransaction
+     * @param array|null $expectedHttpTransaction
      */
     public function testArrayAccessOffsetSetOffsetGet(
         array $existingHttpTransactions,
@@ -201,7 +200,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testArrayAccessOffsetExistsOffsetUnset()
+    public function testArrayAccessOffsetExistsOffsetUnset(): void
     {
         $httpTransaction = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -219,7 +218,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->container->offsetExists(0));
     }
 
-    public function testGetRequests()
+    public function testGetRequests(): void
     {
         $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
         $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
@@ -252,7 +251,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResponses()
+    public function testGetResponses(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
@@ -285,7 +284,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequestUrls()
+    public function testGetRequestUrls(): void
     {
         $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
         $httpTransaction0RequestUri
@@ -335,7 +334,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequestUrlsAsStrings()
+    public function testGetRequestUrlsAsStrings(): void
     {
         $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
         $httpTransaction0RequestUri
@@ -385,7 +384,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLastRequest()
+    public function testGetLastRequest(): void
     {
         $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
         $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
@@ -412,7 +411,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($httpTransaction1Request, $this->container->getLastRequest());
     }
 
-    public function testGetLastRequestUrl()
+    public function testGetLastRequestUrl(): void
     {
         $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
         $httpTransaction1RequestUri
@@ -520,7 +519,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetLastResponse()
+    public function testGetLastResponse(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
@@ -547,7 +546,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($httpTransaction1Response, $this->container->getLastResponse());
     }
 
-    public function testRequestCanBeNull()
+    public function testRequestCanBeNull(): void
     {
         $httpTransaction = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -561,7 +560,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($httpTransaction, $this->container[0]);
     }
 
-    public function testIterator()
+    public function testIterator(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
@@ -598,7 +597,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $iteratedTransactionCount);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $httpTransaction = [
             Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -874,7 +873,7 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTransactions()
+    public function testGetTransactions(): void
     {
         $this->assertEquals([], $this->container->getTransactions());
     }
