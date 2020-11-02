@@ -14,34 +14,18 @@ use Psr\Http\Message\UriInterface;
  */
 class Container implements \ArrayAccess, \Iterator, \Countable
 {
-    public const KEY_REQUEST = 'request';
-    public const KEY_RESPONSE = 'response';
-    public const KEY_ERROR = 'error';
-    public const KEY_OPTIONS = 'options';
-
     public const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
     public const OFFSET_INVALID_CODE = 1;
 
-    public const VALUE_NOT_ARRAY_MESSAGE = 'HTTP transaction must be an array';
-    public const VALUE_NOT_ARRAY_CODE = 2;
-    public const VALUE_MISSING_KEY_MESSAGE = 'Key "%s" must be present';
-    public const VALUE_MISSING_KEY_CODE = 3;
-    public const VALUE_REQUEST_NOT_REQUEST_MESSAGE = '
-    Transaction[\'request\'] must implement ' . RequestInterface::class;
-    public const VALUE_REQUEST_NOT_REQUEST_CODE = 4;
-    public const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE =
-        'Transaction[\'response\'] must implement ' . ResponseInterface::class;
-    public const VALUE_RESPONSE_NOT_RESPONSE_CODE = 5;
-
     /**
-     * @var array<array<string, RequestInterface|ResponseInterface>>
+     * @var HttpTransaction[]
      */
     private array $container = [];
 
     private int $iteratorIndex = 0;
 
     /**
-     * @return array<array<string, RequestInterface|ResponseInterface>>
+     * @return HttpTransaction[]
      */
     public function getTransactions(): array
     {
@@ -50,12 +34,14 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * @param mixed $offset
-     * @param mixed $httpTransaction
+     * @param mixed $httpTransactionData
+     *
+     * @throws InvalidTransactionException
      */
-    public function offsetSet($offset, $httpTransaction): void
+    public function offsetSet($offset, $httpTransactionData): void
     {
         $this->validateOffset($offset);
-        $this->validateHttpTransaction($httpTransaction);
+        $httpTransaction = HttpTransaction::fromArray($httpTransactionData);
 
         if (is_null($offset)) {
             $this->container[] = $httpTransaction;
@@ -66,7 +52,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     public function offsetExists($offset): bool
     {
-        return isset($this->container[$offset]);
+        return null !== $this->offsetGet($offset);
     }
 
     public function offsetUnset($offset): void
@@ -85,9 +71,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @return array<string, RequestInterface|ResponseInterface>
+     * @return HttpTransaction
      */
-    public function current(): array
+    public function current(): HttpTransaction
     {
         return $this->container[$this->iteratorIndex];
     }
@@ -113,32 +99,22 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     public function getRequests(): array
     {
         $requests = [];
-
-        foreach ($this->container as $transaction) {
-            $request = $transaction[self::KEY_REQUEST] ?? null;
-
-            if ($request instanceof RequestInterface) {
-                $requests[] = $request;
-            }
-        }
+        array_walk($this->container, function (HttpTransaction $transaction) use (&$requests) {
+            $requests[] = $transaction->getRequest();
+        });
 
         return $requests;
     }
 
     /**
-     * @return ResponseInterface[]
+     * @return array<int, ?ResponseInterface>
      */
     public function getResponses(): array
     {
         $responses = [];
-
-        foreach ($this->container as $transaction) {
-            $response = $transaction[self::KEY_RESPONSE] ?? null;
-
-            if ($response instanceof ResponseInterface) {
-                $responses[] = $response;
-            }
-        }
+        array_walk($this->container, function (HttpTransaction $transaction) use (&$responses) {
+            $responses[] = $transaction->getResponse();
+        });
 
         return $responses;
     }
@@ -149,9 +125,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     public function getRequestUrls(): array
     {
         $requestUrls = [];
-
-        $requests = $this->getRequests();
-        foreach ($requests as $request) {
+        foreach ($this->getRequests() as $request) {
             $requestUrls[] = $request->getUri();
         }
 
@@ -164,7 +138,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     public function getRequestUrlsAsStrings(): array
     {
         $requestUrlStrings = [];
-
         foreach ($this->getRequestUrls() as $requestUrl) {
             $requestUrlStrings[] = (string) $requestUrl;
         }
@@ -174,13 +147,14 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     public function getLastRequest(): ?RequestInterface
     {
-        return $this->getLastArrayValue($this->getRequests());
+        $requests = $this->getRequests();
+
+        return array_pop($requests);
     }
 
     public function getLastRequestUrl(): ?UriInterface
     {
         $lastRequest = $this->getLastRequest();
-
         if (empty($lastRequest)) {
             return null;
         }
@@ -190,7 +164,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     public function getLastResponse(): ?ResponseInterface
     {
-        return $this->getLastArrayValue($this->getResponses());
+        $responses = $this->getResponses();
+
+        return array_pop($responses);
     }
 
     public function count(): int
@@ -240,10 +216,12 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     private function containsAnyNonRedirectResponses(): bool
     {
         foreach ($this->getResponses() as $response) {
-            $statusCode = $response->getStatusCode();
+            if ($response instanceof ResponseInterface) {
+                $statusCode = $response->getStatusCode();
 
-            if ($statusCode <= 300 || $statusCode >= 400) {
-                return true;
+                if ($statusCode <= 300 || $statusCode >= 400) {
+                    return true;
+                }
             }
         }
 
@@ -260,38 +238,26 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         $currentGroup = [];
 
         foreach ($this->container as $httpTransaction) {
-            $request = $httpTransaction[self::KEY_REQUEST] ?? null;
+            $request = $httpTransaction->getRequest();
 
-            if ($request instanceof RequestInterface) {
-                $method = $request->getMethod();
+            $method = $request->getMethod();
 
-                if (null === $currentMethod) {
-                    $currentMethod = $method;
-                }
-
-                if ($method !== $currentMethod) {
-                    $groups[] = $currentGroup;
-                    $currentGroup = [];
-                    $currentMethod = $method;
-                }
-
-                $currentGroup[] = (string) $request->getUri();
+            if (null === $currentMethod) {
+                $currentMethod = $method;
             }
+
+            if ($method !== $currentMethod) {
+                $groups[] = $currentGroup;
+                $currentGroup = [];
+                $currentMethod = $method;
+            }
+
+            $currentGroup[] = (string) $request->getUri();
         }
 
         $groups[] = $currentGroup;
 
         return $groups;
-    }
-
-    /**
-     * @param array<mixed> $items
-     *
-     * @return mixed|null
-     */
-    private function getLastArrayValue(array $items)
-    {
-        return array_pop($items);
     }
 
     /**
@@ -303,51 +269,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
             throw new \InvalidArgumentException(
                 self::OFFSET_INVALID_MESSAGE,
                 self::OFFSET_INVALID_CODE
-            );
-        }
-    }
-
-    /**
-     * @param array<mixed> $httpTransaction
-     */
-    private function validateHttpTransaction($httpTransaction): void
-    {
-        if (!is_array($httpTransaction)) {
-            throw new \InvalidArgumentException(
-                self::VALUE_NOT_ARRAY_MESSAGE,
-                self::VALUE_NOT_ARRAY_CODE
-            );
-        }
-
-        $requiredKeys = [
-            self::KEY_REQUEST,
-            self::KEY_RESPONSE,
-            self::KEY_ERROR,
-            self::KEY_OPTIONS,
-        ];
-
-        foreach ($requiredKeys as $requiredKey) {
-            if (!array_key_exists($requiredKey, $httpTransaction)) {
-                throw new \InvalidArgumentException(
-                    sprintf(self::VALUE_MISSING_KEY_MESSAGE, $requiredKey),
-                    self::VALUE_MISSING_KEY_CODE
-                );
-            }
-        }
-
-        if (!$httpTransaction[self::KEY_REQUEST] instanceof RequestInterface) {
-            throw new \InvalidArgumentException(
-                self::VALUE_REQUEST_NOT_REQUEST_MESSAGE,
-                self::VALUE_REQUEST_NOT_REQUEST_CODE
-            );
-        }
-
-        $response = $httpTransaction[self::KEY_RESPONSE];
-
-        if (!empty($response) && !$response instanceof ResponseInterface) {
-            throw new \InvalidArgumentException(
-                self::VALUE_RESPONSE_NOT_RESPONSE_MESSAGE,
-                self::VALUE_RESPONSE_NOT_RESPONSE_CODE
             );
         }
     }
