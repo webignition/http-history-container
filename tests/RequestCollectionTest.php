@@ -6,6 +6,7 @@ namespace webignition\HttpHistoryContainer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\RequestCollection;
 
 class RequestCollectionTest extends TestCase
@@ -91,6 +92,52 @@ class RequestCollectionTest extends TestCase
                     $lastRequest,
                 ]),
                 'expectedLast' => $lastRequest,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getLastUrlDataProvider
+     */
+    public function testGetLastUrl(RequestCollection $collection, ?UriInterface $expectedUrl)
+    {
+        self::assertSame($expectedUrl, $collection->getLastUrl());
+    }
+
+    public function getLastUrlDataProvider(): array
+    {
+        $firstUri = \Mockery::mock(UriInterface::class);
+
+        $firstRequest = \Mockery::mock(RequestInterface::class);
+        $firstRequest
+            ->shouldReceive('getUri')
+            ->andReturn($firstUri);
+
+        $lastUri = \Mockery::mock(UriInterface::class);
+
+        $lastRequest = \Mockery::mock(RequestInterface::class);
+        $lastRequest
+            ->shouldReceive('getUri')
+            ->andReturn($lastUri);
+
+        return [
+            'empty' => [
+                'collection' => new RequestCollection([]),
+                'expectedUrl' => null,
+            ],
+            'one' => [
+                'collection' => new RequestCollection([
+                    $firstRequest,
+                ]),
+                'expectedUrl' => $firstUri,
+            ],
+            'many' => [
+                'collection' => new RequestCollection([
+                    $firstRequest,
+                    \Mockery::mock(RequestInterface::class),
+                    $lastRequest,
+                ]),
+                'expectedUrl' => $lastUri,
             ],
         ];
     }

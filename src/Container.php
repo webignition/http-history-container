@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -93,17 +92,14 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return isset($this->container[$this->iteratorIndex]);
     }
 
-    /**
-     * @return RequestInterface[]
-     */
-    public function getRequests(): array
+    public function getRequests(): RequestCollection
     {
         $requests = [];
         array_walk($this->container, function (HttpTransaction $transaction) use (&$requests) {
             $requests[] = $transaction->getRequest();
         });
 
-        return $requests;
+        return new RequestCollection($requests);
     }
 
     /**
@@ -143,23 +139,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         }
 
         return $requestUrlStrings;
-    }
-
-    public function getLastRequest(): ?RequestInterface
-    {
-        $requests = $this->getRequests();
-
-        return array_pop($requests);
-    }
-
-    public function getLastRequestUrl(): ?UriInterface
-    {
-        $lastRequest = $this->getLastRequest();
-        if (empty($lastRequest)) {
-            return null;
-        }
-
-        return $lastRequest->getUri();
     }
 
     public function getLastResponse(): ?ResponseInterface

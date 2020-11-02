@@ -11,6 +11,7 @@ use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Container;
 use webignition\HttpHistoryContainer\HttpTransaction;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
+use webignition\HttpHistoryContainer\RequestCollection;
 
 class ContainerTest extends TestCase
 {
@@ -229,10 +230,10 @@ class ContainerTest extends TestCase
         $this->container[] = $httpTransaction1Data;
 
         $this->assertEquals(
-            [
+            new RequestCollection([
                 $httpTransaction0Request,
                 $httpTransaction1Request,
-            ],
+            ]),
             $this->container->getRequests()
         );
     }
@@ -356,61 +357,6 @@ class ContainerTest extends TestCase
             ],
             $this->container->getRequestUrlsAsStrings()
         );
-    }
-
-    public function testGetLastRequest(): void
-    {
-        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
-
-        $httpTransaction0 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $httpTransaction1 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertEmpty($this->container->getLastRequest());
-
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
-
-        $this->assertEquals($httpTransaction1Request, $this->container->getLastRequest());
-    }
-
-    public function testGetLastRequestUrl(): void
-    {
-        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
-        $httpTransaction1RequestUri
-            ->shouldReceive('__toString')
-            ->andReturn('http://example.com/1/');
-
-        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
-
-        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction1Request
-            ->shouldReceive('getUri')
-            ->andReturn($httpTransaction1RequestUri);
-
-        $httpTransaction0 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $httpTransaction1 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertEmpty($this->container->getLastRequestUrl());
-
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
-
-        $this->assertEquals($httpTransaction1RequestUri, $this->container->getLastRequestUrl());
     }
 
     public function invalidOffsetDataProvider(): array
