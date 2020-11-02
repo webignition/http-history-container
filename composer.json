@@ -22,9 +22,15 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit --colors=always",
-        "cs": "./vendor/bin/phpcs src tests --colors --standard=PSR12",
+        "cs": [
+            "./vendor/bin/ecs check src tests --ansi --config ecs.php",
+            "./vendor/bin/phpcs"
+        ],
+        "cs-fix": [
+            "./vendor/bin/ecs check src tests --ansi --config ecs.php --fix"
+        ],
         "static-analysis": "./vendor/bin/phpstan analyse --ansi",
+        "test": "./vendor/bin/phpunit --colors=always",
         "ci": [
             "@cs",
             "@static-analysis",
@@ -41,7 +47,8 @@
         "mockery/mockery": "^1.4",
         "phpstan/phpstan": "^0.12.53",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan-mockery": "^0.12.7"
+        "phpstan/phpstan-mockery": "^0.12.7",
+        "symplify/easy-coding-standard": "^8.3"
     },
     "minimum-stability":"stable"
 }
