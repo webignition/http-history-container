@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\HttpTransaction;
+use webignition\HttpHistoryContainer\InvalidTransactionException;
 
 class HttpTransactionTest extends TestCase
 {
@@ -49,6 +50,56 @@ class HttpTransactionTest extends TestCase
                 'response' => null,
                 'error' => 'error',
                 'options' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFromArrayThrowsExceptionDataProvider
+     *
+     * @param array<mixed> $data
+     * @param InvalidTransactionException $expectedException
+     */
+    public function testCreateFromArrayThrowsException(array $data, InvalidTransactionException $expectedException)
+    {
+        self::expectExceptionObject($expectedException);
+
+        HttpTransaction::fromArray($data);
+    }
+
+    public function createFromArrayThrowsExceptionDataProvider(): array
+    {
+        $validRequest = \Mockery::mock(RequestInterface::class);
+        $validResponse = \Mockery::mock(ResponseInterface::class);
+
+        return [
+            'request not a RequestInterface' => [
+                'data' => [
+                    'request' => 'not a RequestInterface',
+                    'response' => $validResponse,
+                ],
+                'expectedException' => new InvalidTransactionException(
+                    InvalidTransactionException::VALUE_REQUEST_NOT_REQUEST_MESSAGE,
+                    InvalidTransactionException::VALUE_REQUEST_NOT_REQUEST_CODE,
+                    [
+                        'request' => 'not a RequestInterface',
+                        'response' => $validResponse,
+                    ]
+                ),
+            ],
+            'response neither null nor ResponseInterface' => [
+                'data' => [
+                    'request' => $validRequest,
+                    'response' => 'not null, not ResponseInterface',
+                ],
+                'expectedException' => new InvalidTransactionException(
+                    InvalidTransactionException::VALUE_RESPONSE_NOT_RESPONSE_MESSAGE,
+                    InvalidTransactionException::VALUE_RESPONSE_NOT_RESPONSE_CODE,
+                    [
+                        'request' => $validRequest,
+                        'response' => 'not null, not ResponseInterface',
+                    ]
+                ),
             ],
         ];
     }

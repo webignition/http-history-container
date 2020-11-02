@@ -9,6 +9,11 @@ use Psr\Http\Message\ResponseInterface;
 
 class HttpTransaction
 {
+    public const KEY_REQUEST = 'request';
+    public const KEY_RESPONSE = 'response';
+    public const KEY_ERROR = 'error';
+    public const KEY_OPTIONS = 'options';
+
     private RequestInterface $request;
     private ?ResponseInterface $response;
 
@@ -38,6 +43,31 @@ class HttpTransaction
         $this->response = $response;
         $this->error = $error;
         $this->options = $options;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return HttpTransaction
+     *
+     * @throws InvalidTransactionException
+     */
+    public static function fromArray(array $data): HttpTransaction
+    {
+        $request = $data[self::KEY_REQUEST] ?? null;
+        $response = $data[self::KEY_RESPONSE] ?? null;
+        $error = $data[self::KEY_ERROR] ?? null;
+        $options = $data[self::KEY_OPTIONS] ?? [];
+
+        if (!$request instanceof RequestInterface) {
+            throw InvalidTransactionException::createForInvalidRequest($data);
+        }
+
+        if (null !== $response && !$response instanceof ResponseInterface) {
+            throw InvalidTransactionException::createForInvalidResponse($data);
+        }
+
+        return new HttpTransaction($request, $response, $error, $options);
     }
 
     public function getRequest(): RequestInterface
