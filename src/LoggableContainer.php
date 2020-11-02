@@ -26,7 +26,12 @@ class LoggableContainer extends Container implements \ArrayAccess, \Iterator, \C
     {
         parent::offsetSet($offset, $httpTransactionData);
 
-        $this->logTransaction($this->current());
+        $transactions = $this->getTransactions();
+        $currentTransaction = array_pop($transactions);
+
+        if ($currentTransaction instanceof HttpTransaction) {
+            $this->logTransaction($currentTransaction);
+        }
     }
 
     private function logTransaction(HttpTransaction $transaction): void

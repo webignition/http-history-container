@@ -45,9 +45,9 @@ class LoggableContainerTest extends TestCase
      * @dataProvider logTransactionsDataProvider
      *
      * @param array<mixed> $transactions
-     * @param array<mixed> $expectedDecodedJson
+     * @param array<mixed> $expectedDecodedMessages
      */
-    public function testLogTransactions(array $transactions, array $expectedDecodedJson)
+    public function testLogTransactions(array $transactions, array $expectedDecodedMessages)
     {
         foreach ($transactions as $transaction) {
             $this->container[] = $transaction;
@@ -56,9 +56,23 @@ class LoggableContainerTest extends TestCase
         rewind($this->stream);
         $streamContents = (string) stream_get_contents($this->stream);
 
-        $decodedJson = json_decode($streamContents, true);
+        $loggedMessages = array_filter(
+            explode("\n", $streamContents)
+        );
 
-        self::assertEquals($expectedDecodedJson, $decodedJson);
+        $decodedMessages = [];
+        foreach ($loggedMessages as $loggedMessage) {
+            $decodedMessages[] = json_decode($loggedMessage, true);
+        }
+
+
+//        var_dump($decodedMessages);
+
+//        var_dump($streamContents);
+
+//        $decodedJson = json_decode($streamContents, true);
+//
+        self::assertEquals($expectedDecodedMessages, $decodedMessages);
     }
 
     public function logTransactionsDataProvider(): array
@@ -82,21 +96,23 @@ class LoggableContainerTest extends TestCase
                         'response' => new Response(),
                     ],
                 ],
-                'expectedDecodedJson' => [
-                    'request' => [
-                        'method' => 'GET',
-                        'uri' => 'http://example.com/request_one',
-                        'headers' => [
-                            'Host' => [
-                                'example.com',
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_one',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
                             ],
+                            'body' => '',
                         ],
-                        'body' => '',
-                    ],
-                    'response' => [
-                        'status_code' => 200,
-                        'headers' => [],
-                        'body' => '',
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [],
+                            'body' => '',
+                        ],
                     ],
                 ],
             ],
@@ -107,21 +123,23 @@ class LoggableContainerTest extends TestCase
                         'response' => new Response(404),
                     ],
                 ],
-                'expectedDecodedJson' => [
-                    'request' => [
-                        'method' => 'GET',
-                        'uri' => 'http://example.com/request_one',
-                        'headers' => [
-                            'Host' => [
-                                'example.com',
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_one',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
                             ],
+                            'body' => '',
                         ],
-                        'body' => '',
-                    ],
-                    'response' => [
-                        'status_code' => 404,
-                        'headers' => [],
-                        'body' => '',
+                        'response' => [
+                            'status_code' => 404,
+                            'headers' => [],
+                            'body' => '',
+                        ],
                     ],
                 ],
             ],
@@ -132,21 +150,23 @@ class LoggableContainerTest extends TestCase
                         'response' => new Response(),
                     ],
                 ],
-                'expectedDecodedJson' => [
-                    'request' => [
-                        'method' => 'POST',
-                        'uri' => 'http://example.com/request_two',
-                        'headers' => [
-                            'Host' => [
-                                'example.com',
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'POST',
+                            'uri' => 'http://example.com/request_two',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
                             ],
+                            'body' => '',
                         ],
-                        'body' => '',
-                    ],
-                    'response' => [
-                        'status_code' => 200,
-                        'headers' => [],
-                        'body' => '',
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [],
+                            'body' => '',
+                        ],
                     ],
                 ],
             ],
@@ -164,24 +184,26 @@ class LoggableContainerTest extends TestCase
                         'response' => new Response(),
                     ],
                 ],
-                'expectedDecodedJson' => [
-                    'request' => [
-                        'method' => 'GET',
-                        'uri' => 'http://example.com/request_three',
-                        'headers' => [
-                            'Host' => [
-                                'example.com',
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_three',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
+                                'content-type' => [
+                                    'application/json',
+                                ],
                             ],
-                            'content-type' => [
-                                'application/json',
-                            ],
+                            'body' => $encodedJsonBody,
                         ],
-                        'body' => $encodedJsonBody,
-                    ],
-                    'response' => [
-                        'status_code' => 200,
-                        'headers' => [],
-                        'body' => '',
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [],
+                            'body' => '',
+                        ],
                     ],
                 ],
             ],
@@ -201,25 +223,75 @@ class LoggableContainerTest extends TestCase
                         ),
                     ],
                 ],
-                'expectedDecodedJson' => [
-                    'request' => [
-                        'method' => 'GET',
-                        'uri' => 'http://example.com/request_three',
-                        'headers' => [
-                            'Host' => [
-                                'example.com',
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_three',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
                             ],
+                            'body' => '',
                         ],
-                        'body' => '',
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [
+                                'content-type' => [
+                                    'application/json',
+                                ],
+                            ],
+                            'body' => $encodedJsonBody,
+                        ],
                     ],
-                    'response' => [
-                        'status_code' => 200,
-                        'headers' => [
-                            'content-type' => [
-                                'application/json',
+                ],
+            ],
+            'Two simple GET requests' => [
+                'transactions' => [
+                    [
+                        'request' => new Request('GET', 'http://example.com/request_one'),
+                        'response' => new Response(),
+                    ],
+                    [
+                        'request' => new Request('GET', 'http://example.com/request_two'),
+                        'response' => new Response(),
+                    ],
+                ],
+                'expectedDecodedMessages' => [
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_one',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
                             ],
+                            'body' => '',
                         ],
-                        'body' => $encodedJsonBody,
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [],
+                            'body' => '',
+                        ],
+                    ],
+                    [
+                        'request' => [
+                            'method' => 'GET',
+                            'uri' => 'http://example.com/request_two',
+                            'headers' => [
+                                'Host' => [
+                                    'example.com',
+                                ],
+                            ],
+                            'body' => '',
+                        ],
+                        'response' => [
+                            'status_code' => 200,
+                            'headers' => [],
+                            'body' => '',
+                        ],
                     ],
                 ],
             ],
