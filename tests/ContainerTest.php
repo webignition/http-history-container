@@ -12,6 +12,7 @@ use webignition\HttpHistoryContainer\Container;
 use webignition\HttpHistoryContainer\HttpTransaction;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 use webignition\HttpHistoryContainer\RequestCollection;
+use webignition\HttpHistoryContainer\ResponseCollection;
 
 class ContainerTest extends TestCase
 {
@@ -259,10 +260,10 @@ class ContainerTest extends TestCase
         $this->container[] = $httpTransaction1Data;
 
         $this->assertEquals(
-            [
+            new ResponseCollection([
                 $httpTransaction0Response,
                 $httpTransaction1Response,
-            ],
+            ]),
             $this->container->getResponses()
         );
     }
@@ -369,29 +370,6 @@ class ContainerTest extends TestCase
                 'offset' => 'foo',
             ],
         ];
-    }
-
-    public function testGetLastResponse(): void
-    {
-        $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
-        $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
-
-        $httpTransaction0 = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
-        ];
-
-        $httpTransaction1 = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
-        ];
-
-        $this->assertEmpty($this->container->getLastResponse());
-
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
-
-        $this->assertEquals($httpTransaction1Response, $this->container->getLastResponse());
     }
 
     public function testIterator(): void
