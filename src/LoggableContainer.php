@@ -81,7 +81,7 @@ class LoggableContainer extends Container implements \ArrayAccess, \Iterator, \C
      */
     private function createLoggableMessage(MessageInterface $message): array
     {
-        $loggableBody = clone $message->getBody();
+        $loggableBody = $message->getBody();
         $loggableBody->rewind();
 
         return [
