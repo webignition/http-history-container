@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 
 /**
  * @implements \IteratorAggregate<int, RequestInterface>
@@ -49,10 +48,14 @@ class RequestCollection implements \Countable, \IteratorAggregate
         return array_pop($requests);
     }
 
-    public function getLastUrl(): ?UriInterface
+    public function getUrls(): UrlCollection
     {
-        $lastRequest = $this->getLast();
+        $urls = [];
 
-        return $lastRequest instanceof RequestInterface ? $lastRequest->getUri() : null;
+        foreach ($this->requests as $request) {
+            $urls[] = $request->getUri();
+        }
+
+        return new UrlCollection($urls);
     }
 }

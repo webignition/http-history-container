@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\RequestCollection;
+use webignition\HttpHistoryContainer\UrlCollection;
 
 class RequestCollectionTest extends TestCase
 {
@@ -97,47 +98,57 @@ class RequestCollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider getLastUrlDataProvider
+     * @dataProvider getUrlsDataProvider
      */
-    public function testGetLastUrl(RequestCollection $collection, ?UriInterface $expectedUrl)
+    public function testGetUrls(RequestCollection $collection, UrlCollection $expectedUrls)
     {
-        self::assertSame($expectedUrl, $collection->getLastUrl());
+        self::assertEquals($expectedUrls, $collection->getUrls());
     }
 
-    public function getLastUrlDataProvider(): array
+    public function getUrlsDataProvider(): array
     {
         $firstUri = \Mockery::mock(UriInterface::class);
-
         $firstRequest = \Mockery::mock(RequestInterface::class);
         $firstRequest
             ->shouldReceive('getUri')
             ->andReturn($firstUri);
 
-        $lastUri = \Mockery::mock(UriInterface::class);
-
-        $lastRequest = \Mockery::mock(RequestInterface::class);
-        $lastRequest
+        $secondUri = \Mockery::mock(UriInterface::class);
+        $secondRequest = \Mockery::mock(RequestInterface::class);
+        $secondRequest
             ->shouldReceive('getUri')
-            ->andReturn($lastUri);
+            ->andReturn($secondUri);
+
+        $thirdUri = \Mockery::mock(UriInterface::class);
+        $thirdRequest = \Mockery::mock(RequestInterface::class);
+        $thirdRequest
+            ->shouldReceive('getUri')
+            ->andReturn($thirdUri);
 
         return [
             'empty' => [
                 'collection' => new RequestCollection([]),
-                'expectedUrl' => null,
+                'expectedUrls' => new UrlCollection([]),
             ],
             'one' => [
                 'collection' => new RequestCollection([
                     $firstRequest,
                 ]),
-                'expectedUrl' => $firstUri,
+                'expectedUrls' => new UrlCollection([
+                    $firstUri,
+                ]),
             ],
             'many' => [
                 'collection' => new RequestCollection([
                     $firstRequest,
-                    \Mockery::mock(RequestInterface::class),
-                    $lastRequest,
+                    $secondRequest,
+                    $thirdRequest,
                 ]),
-                'expectedUrl' => $lastUri,
+                'expectedUrls' => new UrlCollection([
+                    $firstUri,
+                    $secondUri,
+                    $thirdUri,
+                ]),
             ],
         ];
     }
