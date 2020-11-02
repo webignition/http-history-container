@@ -60,11 +60,11 @@ class ContainerTest extends TestCase
     /**
      * @dataProvider arrayAccessOffsetSetOffsetGetDataProvider
      *
-     * @param array $existingHttpTransactions
+     * @param array<int, array<int, RequestInterface|ResponseInterface>> $existingHttpTransactions
      * @param mixed $offsetSetOffset
-     * @param array $offsetSetHttpTransaction
+     * @param array<int, array<int, RequestInterface|ResponseInterface>> $offsetSetHttpTransaction
      * @param mixed $offsetGetOffset
-     * @param array|null $expectedHttpTransaction
+     * @param array<int, RequestInterface|ResponseInterface>|null $expectedHttpTransaction
      */
     public function testArrayAccessOffsetSetOffsetGet(
         array $existingHttpTransactions,
@@ -615,6 +615,9 @@ class ContainerTest extends TestCase
 
     /**
      * @dataProvider hasRedirectLoopDataProvider
+     *
+     * @param array<int, array<int, RequestInterface|ResponseInterface>> $httpTransactions
+     * @param bool $expectedHasRedirectLoop
      */
     public function testHasRedirectLoop(array $httpTransactions, bool $expectedHasRedirectLoop)
     {

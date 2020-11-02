@@ -50,7 +50,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * @param mixed $offset
-     * @param array<string, RequestInterface|ResponseInterface> $httpTransaction
+     * @param mixed $httpTransaction
      */
     public function offsetSet($offset, $httpTransaction): void
     {
