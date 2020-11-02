@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\RequestInterface;
@@ -26,14 +28,11 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     const VALUE_RESPONSE_NOT_RESPONSE_CODE = 5;
 
     /**
-     * @var array
+     * @var array<array<string, RequestInterface|ResponseInterface>>
      */
-    private $container = [];
+    private array $container = [];
 
-    /**
-     * @var int
-     */
-    private $iteratorIndex = 0;
+    private int $iteratorIndex = 0;
 
     public function getTransactions(): array
     {
@@ -42,9 +41,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * @param mixed $offset
-     * @param array $httpTransaction
+     * @param array<string, RequestInterface|ResponseInterface> $httpTransaction
      */
-    public function offsetSet($offset, $httpTransaction)
+    public function offsetSet($offset, $httpTransaction): void
     {
         $this->validateOffset($offset);
         $this->validateHttpTransaction($httpTransaction);
@@ -61,7 +60,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return isset($this->container[$offset]);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->container[$offset]);
     }
@@ -71,12 +70,15 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $this->container[$offset] ?? null;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->iteratorIndex = 0;
     }
 
-    public function current()
+    /**
+     * @return array<string, RequestInterface|ResponseInterface>
+     */
+    public function current(): array
     {
         return $this->container[$this->iteratorIndex];
     }
@@ -86,7 +88,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $this->iteratorIndex;
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->iteratorIndex;
     }
@@ -96,6 +98,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return isset($this->container[$this->iteratorIndex]);
     }
 
+    /**
+     * @return RequestInterface[]
+     */
     public function getRequests(): array
     {
         $requests = [];
@@ -107,6 +112,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $requests;
     }
 
+    /**
+     * @return ResponseInterface[]
+     */
     public function getResponses(): array
     {
         $responses = [];
@@ -118,6 +126,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $responses;
     }
 
+    /**
+     * @return UriInterface[]
+     */
     public function getRequestUrls(): array
     {
         $requestUrls = [];
@@ -130,6 +141,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $requestUrls;
     }
 
+    /**
+     * @return string[]
+     */
     public function getRequestUrlsAsStrings(): array
     {
         /* @var string[] $requestUrls */
@@ -168,13 +182,13 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return count($this->container);
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->container = [];
         $this->iteratorIndex = 0;
     }
 
-    public function hasRedirectLoop()
+    public function hasRedirectLoop(): bool
     {
         if ($this->containsAnyNonRedirectResponses()) {
             return false;
@@ -215,6 +229,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return false;
     }
 
+    /**
+     * @return array<int, array<int, string>>
+     */
     private function createUrlGroupsByMethodChange(): array
     {
         $currentMethod = null;
@@ -273,7 +290,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param array $httpTransaction
+     * @param array<mixed> $httpTransaction
      */
     private function validateHttpTransaction($httpTransaction)
     {

@@ -1,15 +1,17 @@
-sudo: false
 language: php
+
 php:
-  - 7.2
+  - '7.4'
+
+before_install:
+  - composer self-update --2
 
 install:
-  - composer install --prefer-dist
+  - composer install --prefer-dist --no-suggest
 
 script:
-  - composer cs
-  - composer test
+  - composer ci
 
 cache:
   directories:
-    - $HOME/.composer/cache/files
+    - "$HOME/.composer/cache/files"
