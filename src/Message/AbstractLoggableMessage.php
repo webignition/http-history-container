@@ -8,6 +8,9 @@ use Psr\Http\Message\MessageInterface;
 
 abstract class AbstractLoggableMessage implements \JsonSerializable
 {
+    public const KEY_HEADERS = 'headers';
+    public const KEY_BODY = 'body';
+
     abstract protected function getMessage(): ?MessageInterface;
 
     /**
@@ -22,8 +25,8 @@ abstract class AbstractLoggableMessage implements \JsonSerializable
             $loggableBody->rewind();
 
             return [
-                'headers' => $message->getHeaders(),
-                'body' => $loggableBody->getContents()
+                self::KEY_HEADERS => $message->getHeaders(),
+                self::KEY_BODY => $loggableBody->getContents()
             ];
         }
 
