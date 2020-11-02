@@ -12,11 +12,41 @@ class LoggableTransaction implements \JsonSerializable
     public const KEY_REQUEST = 'request';
     public const KEY_RESPONSE = 'response';
 
+    private const DEFAULT_EMPTY_REQUEST_DATA = [];
+    private const DEFAULT_EMPTY_RESPONSE_DATA = [];
+
     private HttpTransaction $transaction;
 
     public function __construct(HttpTransaction $transaction)
     {
         $this->transaction = $transaction;
+    }
+
+    public static function fromJson(string $transaction): self
+    {
+        $data = json_decode($transaction, true);
+
+        $requestData = $data[self::KEY_REQUEST] ?? self::DEFAULT_EMPTY_REQUEST_DATA;
+        if (!is_array($requestData)) {
+            $requestData = self::DEFAULT_EMPTY_REQUEST_DATA;
+        }
+
+        $responseData = $data[self::KEY_RESPONSE] ?? self::DEFAULT_EMPTY_RESPONSE_DATA;
+        if (!is_array($responseData)) {
+            $responseData = self::DEFAULT_EMPTY_RESPONSE_DATA;
+        }
+
+        $loggableRequest = LoggableRequest::fromJson((string) json_encode($requestData));
+        $loggableResponse = LoggableResponse::fromJson((string) json_encode($responseData));
+
+        return new LoggableTransaction(
+            new HttpTransaction(
+                $loggableRequest->getRequest(),
+                $loggableResponse->getResponse(),
+                null,
+                []
+            )
+        );
     }
 
     public function getTransaction(): HttpTransaction

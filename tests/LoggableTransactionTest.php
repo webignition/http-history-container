@@ -47,4 +47,37 @@ class LoggableTransactionTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider fromJsonDataProvider
+     */
+    public function testFromJson(string $serializedTransaction, LoggableTransaction $expectedLoggableTransaction)
+    {
+        $loggableTransaction = LoggableTransaction::fromJson($serializedTransaction);
+
+        self::assertEquals($expectedLoggableTransaction, $loggableTransaction);
+    }
+
+    public function fromJsonDataProvider(): array
+    {
+        $request = new Request('GET', 'http://example.com/request_one');
+        $response = new Response();
+
+        return [
+            'GET req, no req headers, no req body, 200 response, no resp headers, no resp body' => [
+                'serializedTransaction' => json_encode([
+                    'request' => new LoggableRequest($request),
+                    'response' => new LoggableResponse($response),
+                ]),
+                'transaction' => new LoggableTransaction(
+                    new HttpTransaction(
+                        new Request('GET', 'http://example.com/request_one'),
+                        new Response(),
+                        null,
+                        []
+                    )
+                ),
+            ],
+        ];
+    }
 }
