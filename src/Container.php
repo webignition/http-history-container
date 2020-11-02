@@ -8,6 +8,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * @implements \ArrayAccess<int, mixed>
+ * @implements \Iterator<mixed>
+ */
 class Container implements \ArrayAccess, \Iterator, \Countable
 {
     public const KEY_REQUEST = 'request';
@@ -36,6 +40,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     private int $iteratorIndex = 0;
 
+    /**
+     * @return array<array<string, RequestInterface|ResponseInterface>>
+     */
     public function getTransactions(): array
     {
         return $this->container;
@@ -43,7 +50,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * @param mixed $offset
-     * @param array<string, RequestInterface|ResponseInterface> $httpTransaction
+     * @param mixed $httpTransaction
      */
     public function offsetSet($offset, $httpTransaction): void
     {
@@ -108,7 +115,11 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         $requests = [];
 
         foreach ($this->container as $transaction) {
-            $requests[] = $transaction[self::KEY_REQUEST];
+            $request = $transaction[self::KEY_REQUEST] ?? null;
+
+            if ($request instanceof RequestInterface) {
+                $requests[] = $request;
+            }
         }
 
         return $requests;
@@ -122,7 +133,11 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         $responses = [];
 
         foreach ($this->container as $transaction) {
-            $responses[] = $transaction[self::KEY_RESPONSE];
+            $response = $transaction[self::KEY_RESPONSE] ?? null;
+
+            if ($response instanceof ResponseInterface) {
+                $responses[] = $response;
+            }
         }
 
         return $responses;
@@ -148,14 +163,13 @@ class Container implements \ArrayAccess, \Iterator, \Countable
      */
     public function getRequestUrlsAsStrings(): array
     {
-        /* @var string[] $requestUrls */
-        $requestUrls = $this->getRequestUrls();
+        $requestUrlStrings = [];
 
-        array_walk($requestUrls, function (&$item) {
-            $item = (string)$item;
-        });
+        foreach ($this->getRequestUrls() as $requestUrl) {
+            $requestUrlStrings[] = (string) $requestUrl;
+        }
 
-        return $requestUrls;
+        return $requestUrlStrings;
     }
 
     public function getLastRequest(): ?RequestInterface
@@ -207,6 +221,11 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return false;
     }
 
+    /**
+     * @param string[] $urls
+     *
+     * @return bool
+     */
     private function doesUrlSetHaveRedirectLoop(array $urls): bool
     {
         foreach ($urls as $urlIndex => $url) {
@@ -241,22 +260,23 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         $currentGroup = [];
 
         foreach ($this->container as $httpTransaction) {
-            /* @var RequestInterface $request */
-            $request = $httpTransaction['request'];
+            $request = $httpTransaction[self::KEY_REQUEST] ?? null;
 
-            $method = $request->getMethod();
+            if ($request instanceof RequestInterface) {
+                $method = $request->getMethod();
 
-            if (null === $currentMethod) {
-                $currentMethod = $method;
+                if (null === $currentMethod) {
+                    $currentMethod = $method;
+                }
+
+                if ($method !== $currentMethod) {
+                    $groups[] = $currentGroup;
+                    $currentGroup = [];
+                    $currentMethod = $method;
+                }
+
+                $currentGroup[] = (string) $request->getUri();
             }
-
-            if ($method !== $currentMethod) {
-                $groups[] = $currentGroup;
-                $currentGroup = [];
-                $currentMethod = $method;
-            }
-
-            $currentGroup[] = (string) $request->getUri();
         }
 
         $groups[] = $currentGroup;
@@ -265,23 +285,19 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param array $items
+     * @param array<mixed> $items
      *
      * @return mixed|null
      */
     private function getLastArrayValue(array $items)
     {
-        if (empty($items)) {
-            return null;
-        }
-
         return array_pop($items);
     }
 
     /**
      * @param mixed $offset
      */
-    private function validateOffset($offset)
+    private function validateOffset($offset): void
     {
         if (!(is_null($offset) || is_int($offset))) {
             throw new \InvalidArgumentException(
@@ -294,7 +310,7 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     /**
      * @param array<mixed> $httpTransaction
      */
-    private function validateHttpTransaction($httpTransaction)
+    private function validateHttpTransaction($httpTransaction): void
     {
         if (!is_array($httpTransaction)) {
             throw new \InvalidArgumentException(
