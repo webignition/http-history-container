@@ -29,7 +29,7 @@ class ContainerTest extends TestCase
      *
      * @param mixed $offset
      */
-    public function testOffsetSetInvalidOffset($offset):  void
+    public function testOffsetSetInvalidOffset($offset): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(Container::OFFSET_INVALID_MESSAGE);

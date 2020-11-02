@@ -10,22 +10,24 @@ use Psr\Http\Message\UriInterface;
 
 class Container implements \ArrayAccess, \Iterator, \Countable
 {
-    const KEY_REQUEST = 'request';
-    const KEY_RESPONSE = 'response';
-    const KEY_ERROR = 'error';
-    const KEY_OPTIONS = 'options';
+    public const KEY_REQUEST = 'request';
+    public const KEY_RESPONSE = 'response';
+    public const KEY_ERROR = 'error';
+    public const KEY_OPTIONS = 'options';
 
-    const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
-    const OFFSET_INVALID_CODE = 1;
+    public const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
+    public const OFFSET_INVALID_CODE = 1;
 
-    const VALUE_NOT_ARRAY_MESSAGE = 'HTTP transaction must be an array';
-    const VALUE_NOT_ARRAY_CODE = 2;
-    const VALUE_MISSING_KEY_MESSAGE = 'Key "%s" must be present';
-    const VALUE_MISSING_KEY_CODE = 3;
-    const VALUE_REQUEST_NOT_REQUEST_MESSAGE = 'Transaction[\'request\'] must implement ' . RequestInterface::class;
-    const VALUE_REQUEST_NOT_REQUEST_CODE = 4;
-    const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE = 'Transaction[\'response\'] must implement ' . ResponseInterface::class;
-    const VALUE_RESPONSE_NOT_RESPONSE_CODE = 5;
+    public const VALUE_NOT_ARRAY_MESSAGE = 'HTTP transaction must be an array';
+    public const VALUE_NOT_ARRAY_CODE = 2;
+    public const VALUE_MISSING_KEY_MESSAGE = 'Key "%s" must be present';
+    public const VALUE_MISSING_KEY_CODE = 3;
+    public const VALUE_REQUEST_NOT_REQUEST_MESSAGE = '
+    Transaction[\'request\'] must implement ' . RequestInterface::class;
+    public const VALUE_REQUEST_NOT_REQUEST_CODE = 4;
+    public const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE =
+        'Transaction[\'response\'] must implement ' . ResponseInterface::class;
+    public const VALUE_RESPONSE_NOT_RESPONSE_CODE = 5;
 
     /**
      * @var array<array<string, RequestInterface|ResponseInterface>>
