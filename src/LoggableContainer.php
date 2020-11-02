@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -36,62 +33,8 @@ class LoggableContainer extends Container implements \ArrayAccess, \Iterator, \C
 
     private function logTransaction(HttpTransaction $transaction): void
     {
-        $loggable = [
-            'request' => $this->createLoggableRequest($transaction->getRequest()),
-            'response' => $this->createLoggableResponse($transaction->getResponse()),
-        ];
+        $loggableTransaction = new LoggableTransaction($transaction);
 
-        $this->logger->debug((string) json_encode($loggable));
-    }
-
-    /**
-     * @param RequestInterface $request
-     *
-     * @return array<string, mixed>
-     */
-    private function createLoggableRequest(RequestInterface $request): array
-    {
-        return array_merge(
-            [
-                'method' => $request->getMethod(),
-                'uri' => (string) $request->getUri(),
-            ],
-            $this->createLoggableMessage($request)
-        );
-    }
-
-    /**
-     * @param ResponseInterface|null $response
-     *
-     * @return array<string, mixed>
-     */
-    private function createLoggableResponse(?ResponseInterface $response): array
-    {
-        if ($response instanceof ResponseInterface) {
-            return array_merge(
-                [
-                    'status_code' => $response->getStatusCode(),
-                ],
-                $this->createLoggableMessage($response)
-            );
-        }
-
-        return [];
-    }
-
-    /**
-     * @param MessageInterface $message
-     *
-     * @return array<string, mixed>
-     */
-    private function createLoggableMessage(MessageInterface $message): array
-    {
-        $loggableBody = $message->getBody();
-        $loggableBody->rewind();
-
-        return [
-            'headers' => $message->getHeaders(),
-            'body' => $loggableBody->getContents()
-        ];
+        $this->logger->debug((string) json_encode($loggableTransaction));
     }
 }

@@ -65,13 +65,6 @@ class LoggableContainerTest extends TestCase
             $decodedMessages[] = json_decode($loggedMessage, true);
         }
 
-
-//        var_dump($decodedMessages);
-
-//        var_dump($streamContents);
-
-//        $decodedJson = json_decode($streamContents, true);
-//
         self::assertEquals($expectedDecodedMessages, $decodedMessages);
     }
 
