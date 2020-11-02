@@ -9,6 +9,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Container;
+use webignition\HttpHistoryContainer\HttpTransaction;
+use webignition\HttpHistoryContainer\InvalidTransactionException;
 
 class ContainerTest extends TestCase
 {
@@ -38,40 +40,30 @@ class ContainerTest extends TestCase
         $this->container->offsetSet($offset, null);
     }
 
-    /**
-     * @dataProvider invalidHttpTransactionDataProvider
-     *
-     * @param mixed $httpTransaction
-     * @param string $expectedExceptionMessage
-     * @param int $expectedExceptionCode
-     */
-    public function testOffsetSetInvalidHttpTransaction(
-        $httpTransaction,
-        string $expectedExceptionMessage,
-        int $expectedExceptionCode
-    ): void {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->expectExceptionCode($expectedExceptionCode);
+    public function testOffsetSetInvalidHttpTransactionFoo(): void
+    {
+        $data = [];
 
-        $this->container->offsetSet(null, $httpTransaction);
+        $this->expectExceptionObject(InvalidTransactionException::createForInvalidRequest($data));
+
+        $this->container->offsetSet(null, $data);
     }
 
     /**
      * @dataProvider arrayAccessOffsetSetOffsetGetDataProvider
      *
-     * @param array<int, array<int, RequestInterface|ResponseInterface>> $existingHttpTransactions
+     * @param array<int, array<string, mixed>> $existingHttpTransactions
      * @param mixed $offsetSetOffset
-     * @param array<int, array<int, RequestInterface|ResponseInterface>> $offsetSetHttpTransaction
+     * @param array<string, mixed> $offsetSetHttpTransaction
      * @param mixed $offsetGetOffset
-     * @param array<int, RequestInterface|ResponseInterface>|null $expectedHttpTransaction
+     * @param HttpTransaction|null $expectedHttpTransaction
      */
     public function testArrayAccessOffsetSetOffsetGet(
         array $existingHttpTransactions,
         $offsetSetOffset,
         array $offsetSetHttpTransaction,
         $offsetGetOffset,
-        ?array $expectedHttpTransaction
+        ?HttpTransaction $expectedHttpTransaction
     ) {
         foreach ($existingHttpTransactions as $existingOffset => $existingTransaction) {
             $this->container->offsetSet($existingOffset, $existingTransaction);
@@ -83,119 +75,119 @@ class ContainerTest extends TestCase
 
     public function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {
-        $httpTransaction0 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => [
+        $httpTransaction0Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
                 'value_0_options_key' => 'value_0_options_value',
             ]
         ];
 
-        $httpTransaction1 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => [
+        $httpTransaction1Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
                 'value_1_options_key' => 'value_1_options_value',
             ]
         ];
 
         $existingHttpTransactions = [
-            $httpTransaction0,
+            $httpTransaction0Data,
         ];
 
         return [
             'no existing values; offsetSetOffset=null, offsetGetOffset=null' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => null,
                 'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=null, offsetGetOffset=0' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => $httpTransaction0,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
             'no existing values; offsetSetOffset=null, offsetGetOffset=1' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => 1,
                 'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=null' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => null,
                 'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=0' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => 0,
                 'expectedHttpTransaction' => null,
             ],
             'no existing values; offsetSetOffset=1, offsetGetOffset=1' => [
                 'existingHttpTransactions' => [],
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0,
+                'offsetSetHttpTransaction' => $httpTransaction0Data,
                 'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => $httpTransaction0,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=null' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => null,
                 'expectedHttpTransaction' => null,
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=0' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => $httpTransaction0,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
             'has existing values; offsetSetOffset=null, offsetGetOffset=1' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => $httpTransaction1,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=null' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => null,
                 'expectedHttpTransaction' => null,
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=0' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => $httpTransaction0,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
             'has existing values; offsetSetOffset=1, offsetGetOffset=1' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => $httpTransaction1,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
             ],
             'has existing values; offsetSetOffset=0, offsetGetOffset=0' => [
                 'existingHttpTransactions' => $existingHttpTransactions,
                 'offsetSetOffset' => 0,
-                'offsetSetHttpTransaction' => $httpTransaction1,
+                'offsetSetHttpTransaction' => $httpTransaction1Data,
                 'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => $httpTransaction1,
+                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
             ],
         ];
     }
@@ -203,10 +195,8 @@ class ContainerTest extends TestCase
     public function testArrayAccessOffsetExistsOffsetUnset(): void
     {
         $httpTransaction = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertFalse($this->container->offsetExists(0));
@@ -223,24 +213,20 @@ class ContainerTest extends TestCase
         $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
         $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
 
-        $httpTransaction0 = [
-            Container::KEY_REQUEST => $httpTransaction0Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction0Data = [
+            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
-        $httpTransaction1 = [
-            Container::KEY_REQUEST => $httpTransaction1Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction1Data = [
+            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertEmpty($this->container->getRequests());
 
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
+        $this->container[] = $httpTransaction0Data;
+        $this->container[] = $httpTransaction1Data;
 
         $this->assertEquals(
             [
@@ -256,24 +242,20 @@ class ContainerTest extends TestCase
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
-        $httpTransaction0 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction0Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction0Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
         ];
 
-        $httpTransaction1 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction1Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction1Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
         ];
 
         $this->assertEmpty($this->container->getResponses());
 
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
+        $this->container[] = $httpTransaction0Data;
+        $this->container[] = $httpTransaction1Data;
 
         $this->assertEquals(
             [
@@ -307,17 +289,13 @@ class ContainerTest extends TestCase
             ->andReturn($httpTransaction1RequestUri);
 
         $httpTransaction0 = [
-            Container::KEY_REQUEST => $httpTransaction0Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $httpTransaction1 = [
-            Container::KEY_REQUEST => $httpTransaction1Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertEmpty($this->container->getRequestUrls());
@@ -357,17 +335,13 @@ class ContainerTest extends TestCase
             ->andReturn($httpTransaction1RequestUri);
 
         $httpTransaction0 = [
-            Container::KEY_REQUEST => $httpTransaction0Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $httpTransaction1 = [
-            Container::KEY_REQUEST => $httpTransaction1Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertEmpty($this->container->getRequestUrlsAsStrings());
@@ -390,17 +364,13 @@ class ContainerTest extends TestCase
         $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
 
         $httpTransaction0 = [
-            Container::KEY_REQUEST => $httpTransaction0Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $httpTransaction1 = [
-            Container::KEY_REQUEST => $httpTransaction1Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertEmpty($this->container->getLastRequest());
@@ -426,17 +396,13 @@ class ContainerTest extends TestCase
             ->andReturn($httpTransaction1RequestUri);
 
         $httpTransaction0 = [
-            Container::KEY_REQUEST => $httpTransaction0Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $httpTransaction1 = [
-            Container::KEY_REQUEST => $httpTransaction1Request,
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->assertEmpty($this->container->getLastRequestUrl());
@@ -459,83 +425,19 @@ class ContainerTest extends TestCase
         ];
     }
 
-    public function invalidHttpTransactionDataProvider(): array
-    {
-        return [
-            'not an array' => [
-                'httpTransaction' => null,
-                'expectedExceptionMessage' => Container::VALUE_NOT_ARRAY_MESSAGE,
-                'expectedExceptionCode' => Container::VALUE_NOT_ARRAY_CODE,
-            ],
-            'missing request key' => [
-                'httpTransaction' => [],
-                'expectedExceptionMessage' => 'Key "request" must be present',
-                'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
-            ],
-            'missing response key' => [
-                'httpTransaction' => [
-                    Container::KEY_REQUEST => null,
-                ],
-                'expectedExceptionMessage' => 'Key "response" must be present',
-                'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
-            ],
-            'missing error key' => [
-                'httpTransaction' => [
-                    Container::KEY_REQUEST => null,
-                    Container::KEY_RESPONSE => null,
-                ],
-                'expectedExceptionMessage' => 'Key "error" must be present',
-                'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
-            ],
-            'missing options key' => [
-                'httpTransaction' => [
-                    Container::KEY_REQUEST => null,
-                    Container::KEY_RESPONSE => null,
-                    Container::KEY_ERROR => null,
-                ],
-                'expectedExceptionMessage' => 'Key "options" must be present',
-                'expectedExceptionCode' => Container::VALUE_MISSING_KEY_CODE,
-            ],
-            'request not a RequestInterface' => [
-                'httpTransaction' => [
-                    Container::KEY_REQUEST => null,
-                    Container::KEY_RESPONSE => null,
-                    Container::KEY_ERROR => null,
-                    Container::KEY_OPTIONS => null,
-                ],
-                'expectedExceptionMessage' => Container::VALUE_REQUEST_NOT_REQUEST_MESSAGE,
-                'expectedExceptionCode' => Container::VALUE_REQUEST_NOT_REQUEST_CODE,
-            ],
-            'response not a ResponseInterface' => [
-                'httpTransaction' => [
-                    Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                    Container::KEY_RESPONSE => new \stdClass(),
-                    Container::KEY_ERROR => null,
-                    Container::KEY_OPTIONS => null,
-                ],
-                'expectedExceptionMessage' => Container::VALUE_RESPONSE_NOT_RESPONSE_MESSAGE,
-                'expectedExceptionCode' => Container::VALUE_RESPONSE_NOT_RESPONSE_CODE,
-            ],
-        ];
-    }
-
     public function testGetLastResponse(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
         $httpTransaction0 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction0Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
         ];
 
         $httpTransaction1 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction1Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
         ];
 
         $this->assertEmpty($this->container->getLastResponse());
@@ -546,46 +448,28 @@ class ContainerTest extends TestCase
         $this->assertEquals($httpTransaction1Response, $this->container->getLastResponse());
     }
 
-    public function testRequestCanBeNull(): void
-    {
-        $httpTransaction = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => null,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
-        ];
-
-        $this->container[] = $httpTransaction;
-
-        $this->assertEquals($httpTransaction, $this->container[0]);
-    }
-
     public function testIterator(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
-        $httpTransaction0 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction0Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction0Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
         ];
 
-        $httpTransaction1 = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => $httpTransaction1Response,
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+        $httpTransaction1Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
         ];
 
         $httpTransactions = [
-            $httpTransaction0,
-            $httpTransaction1,
+            HttpTransaction::fromArray($httpTransaction0Data),
+            HttpTransaction::fromArray($httpTransaction1Data),
         ];
 
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
+        $this->container[] = $httpTransaction0Data;
+        $this->container[] = $httpTransaction1Data;
 
         $iteratedTransactionCount = 0;
 
@@ -600,10 +484,8 @@ class ContainerTest extends TestCase
     public function testClear(): void
     {
         $httpTransaction = [
-            Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            Container::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            Container::KEY_ERROR => null,
-            Container::KEY_OPTIONS => []
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $this->container[] = $httpTransaction;
@@ -634,10 +516,10 @@ class ContainerTest extends TestCase
             'single 200 response' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        Container::KEY_RESPONSE => $this->createResponse(200),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(200),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => false,
@@ -645,16 +527,16 @@ class ContainerTest extends TestCase
             'contains non-redirect response (200)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        Container::KEY_RESPONSE => $this->createResponse(200),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(200),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => false,
@@ -662,16 +544,16 @@ class ContainerTest extends TestCase
             'contains non-redirect response (404)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        Container::KEY_RESPONSE => $this->createResponse(404),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(404),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => false,
@@ -679,16 +561,16 @@ class ContainerTest extends TestCase
             'only redirects, no loop (all different)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => false,
@@ -696,16 +578,16 @@ class ContainerTest extends TestCase
             'method change within apparent loop is not loop' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => false,
@@ -713,16 +595,16 @@ class ContainerTest extends TestCase
             'redirecting directly back to self' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => true,
@@ -730,22 +612,22 @@ class ContainerTest extends TestCase
             'redirecting indirectly back to self' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => true,
@@ -753,40 +635,40 @@ class ContainerTest extends TestCase
             'redirecting indirectly back to self (with method group change)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => true,
@@ -794,40 +676,40 @@ class ContainerTest extends TestCase
             'redirecting indirectly back to self(with method group change, loop in first group only)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/2'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/2'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => true,
@@ -835,40 +717,40 @@ class ContainerTest extends TestCase
             'redirecting indirectly back to self(with method group change, loop in second group only)' => [
                 'httpTransactions' => [
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/2'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/2'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                     [
-                        Container::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        Container::KEY_RESPONSE => $this->createResponse(301),
-                        Container::KEY_ERROR => null,
-                        Container::KEY_OPTIONS => []
+                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
+                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
+                        HttpTransaction::KEY_ERROR => null,
+                        HttpTransaction::KEY_OPTIONS => []
                     ],
                 ],
                 'expectedHasRedirectLoop' => true,
