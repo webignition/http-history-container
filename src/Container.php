@@ -99,9 +99,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     public function getRequests(): array
     {
         $requests = [];
-        foreach ($this->container as $transaction) {
+        array_walk($this->container, function (HttpTransaction $transaction) use (&$requests) {
             $requests[] = $transaction->getRequest();
-        }
+        });
 
         return $requests;
     }
@@ -112,9 +112,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
     public function getResponses(): array
     {
         $responses = [];
-        foreach ($this->container as $transaction) {
+        array_walk($this->container, function (HttpTransaction $transaction) use (&$responses) {
             $responses[] = $transaction->getResponse();
-        }
+        });
 
         return $responses;
     }
@@ -147,7 +147,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     public function getLastRequest(): ?RequestInterface
     {
-        return $this->getLastArrayValue($this->getRequests());
+        $requests = $this->getRequests();
+
+        return array_pop($requests);
     }
 
     public function getLastRequestUrl(): ?UriInterface
@@ -162,7 +164,9 @@ class Container implements \ArrayAccess, \Iterator, \Countable
 
     public function getLastResponse(): ?ResponseInterface
     {
-        return $this->getLastArrayValue($this->getResponses());
+        $responses = $this->getResponses();
+
+        return array_pop($responses);
     }
 
     public function count(): int
@@ -254,16 +258,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         $groups[] = $currentGroup;
 
         return $groups;
-    }
-
-    /**
-     * @param array<mixed> $items
-     *
-     * @return mixed|null
-     */
-    private function getLastArrayValue(array $items)
-    {
-        return array_pop($items);
     }
 
     /**
