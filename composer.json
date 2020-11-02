@@ -39,7 +39,9 @@
     },
     "require": {
       "php": ">=7.4.0",
-      "psr/http-message": "^1"
+      "ext-json": "*",
+      "psr/http-message": "^1",
+      "psr/log": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4",
@@ -48,7 +50,9 @@
         "phpstan/phpstan": "^0.12.53",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-mockery": "^0.12.7",
-        "symplify/easy-coding-standard": "^8.3"
+        "symplify/easy-coding-standard": "^8.3",
+        "monolog/monolog": "^2.1",
+        "guzzlehttp/psr7": "^1.7"
     },
     "minimum-stability":"stable"
 }
