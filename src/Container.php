@@ -102,17 +102,14 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return new RequestCollection($requests);
     }
 
-    /**
-     * @return array<int, ?ResponseInterface>
-     */
-    public function getResponses(): array
+    public function getResponses(): ResponseCollection
     {
         $responses = [];
         array_walk($this->container, function (HttpTransaction $transaction) use (&$responses) {
             $responses[] = $transaction->getResponse();
         });
 
-        return $responses;
+        return new ResponseCollection($responses);
     }
 
     /**
@@ -139,13 +136,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         }
 
         return $requestUrlStrings;
-    }
-
-    public function getLastResponse(): ?ResponseInterface
-    {
-        $responses = $this->getResponses();
-
-        return array_pop($responses);
     }
 
     public function count(): int
