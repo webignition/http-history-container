@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests;
+namespace webignition\HttpHistoryContainer\Tests\Collection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
-use webignition\HttpHistoryContainer\RequestCollection;
-use webignition\HttpHistoryContainer\UrlCollection;
+use webignition\HttpHistoryContainer\Collection\RequestCollection;
+use webignition\HttpHistoryContainer\Collection\UrlCollection;
 
 class RequestCollectionTest extends TestCase
 {

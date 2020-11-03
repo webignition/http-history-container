@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer;
+namespace webignition\HttpHistoryContainer\Collection;
 
 use Psr\Http\Message\UriInterface;
 

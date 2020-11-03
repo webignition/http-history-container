@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests;
+namespace webignition\HttpHistoryContainer\Tests\Collection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use webignition\HttpHistoryContainer\ResponseCollection;
+use webignition\HttpHistoryContainer\Collection\ResponseCollection;
 
 class ResponseCollectionTest extends TestCase
 {

@@ -6,6 +6,8 @@ namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use webignition\HttpHistoryContainer\Collection\RequestCollection;
+use webignition\HttpHistoryContainer\Collection\ResponseCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 /**
