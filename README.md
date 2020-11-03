@@ -1,68 +1,52 @@
-# http-history-container
+# Guzzle HTTP History Container
 
-A collection of convenience methods for getting requests and responses from a container used by the Guzzle history middleware.
+Helping you more easily test what your [Guzzle HTTP client](https://docs.guzzlephp.org/en/stable/) has been up to.
 
-## Usage
+A container for [Guzzle history middleware](https://docs.guzzlephp.org/en/stable/testing.html#history-middleware)
+offering smashingly-nice access to:
+ 
+- collections of HTTP transactions (requests plus responses)
+- requests made
+- responses received
+- request URLs 
+
+Oh also logging. Really useful when your Guzzle client under test is not executing within the same thread as your tests.
+
+## Basic Usage
 
 ```php
 <?php
 
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use webignition\HttpHistoryContainer\Container;
-
-$historycontainer = new Container();
-$historyHandler = Middleware::history($historycontainer);
-$handlerStack = HandlerStack::create($historyHandler);
-$httpClient = new HttpClient(['handler' => $handlerStack]);
-```
-
-## Method overview
-
-```php
-<?php
-
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
+use webignition\HttpHistoryContainer\Container;
 
-interface ContainerInterface
-{
-    /**
-     * @return RequestInterface[]
-     */
-    public function getRequests();
+$historyContainer = new Container();
+$historyHandler = Middleware::history($historyContainer);
+$handlerStack = HandlerStack::create($historyHandler);
+$httpClient = new HttpClient(['handler' => $handlerStack]);
 
-    /**
-     * @return ResponseInterface[]
-     */
-    public function getResponses();
+/// ... things happen ...
 
-    /**
-     * @return UriInterface[]
-     */
-    public function getRequestUrls();
+$historyContainer->getTransactions();
+// an array of HttpTransaction
 
-    /**
-     * @return string[]
-     */
-    public function getRequestUrlsAsStrings();
+$historyContainer->getRequests();
+// a Collection\RequestCollection
 
-    /**
-     * @return RequestInterface
-     */
-    public function getLastRequest();
+$historyContainer->getResponses();
+// a Collection\ResponseCollection
 
-    /**
-     * @return UriInterface
-     */
-    public function getLastRequestUrl();
+foreach ($historyContainer as $transaction) {
+    // $transaction is a HttpTransaction
 
-    /**
-     * @return ResponseInterface
-     */
-    public function getLastResponse();
+    $request = $transaction->getRequest();
+    // $request is a RequestInterface
+
+    $response = $transaction->getResponse();
+    // $response is a ResponseInterface
 }
 ```
