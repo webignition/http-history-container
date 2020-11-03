@@ -128,19 +128,6 @@ class Container implements \ArrayAccess, \Iterator, \Countable
         return $requestUrls;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getRequestUrlsAsStrings(): array
-    {
-        $requestUrlStrings = [];
-        foreach ($this->getRequestUrls() as $requestUrl) {
-            $requestUrlStrings[] = (string) $requestUrl;
-        }
-
-        return $requestUrlStrings;
-    }
-
     public function count(): int
     {
         return count($this->container);

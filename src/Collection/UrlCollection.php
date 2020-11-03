@@ -47,4 +47,18 @@ class UrlCollection implements \Countable, \IteratorAggregate
 
         return array_pop($urls);
     }
+
+    /**
+     * @return string[]
+     */
+    public function getAsStrings(): array
+    {
+        $urlStrings = [];
+
+        foreach ($this as $url) {
+            $urlStrings[] = (string) $url;
+        }
+
+        return $urlStrings;
+    }
 }
