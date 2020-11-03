@@ -9,10 +9,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Container;
-use webignition\HttpHistoryContainer\HttpTransaction;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 use webignition\HttpHistoryContainer\RequestCollection;
 use webignition\HttpHistoryContainer\ResponseCollection;
+use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 class ContainerTest extends TestCase
 {

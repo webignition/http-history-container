@@ -6,6 +6,7 @@ namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 /**
  * @implements \ArrayAccess<int, mixed>

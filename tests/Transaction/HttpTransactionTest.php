@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests;
+namespace webignition\HttpHistoryContainer\Tests\Transaction;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use webignition\HttpHistoryContainer\HttpTransaction;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
+use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 class HttpTransactionTest extends TestCase
 {
