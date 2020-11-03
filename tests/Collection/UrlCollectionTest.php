@@ -94,4 +94,27 @@ class UrlCollectionTest extends TestCase
             ],
         ];
     }
+
+    public function testGetAsStrings(): void
+    {
+        $urlStrings = [
+            'http://example.com/one',
+            'http://example.com/two',
+            'http://example.com/three',
+        ];
+
+        $urls = [];
+        foreach ($urlStrings as $urlString) {
+            $url = \Mockery::mock(UriInterface::class);
+            $url
+                ->shouldReceive('__toString')
+                ->andReturn($urlString);
+
+            $urls[] = $url;
+        }
+
+        $collection = new UrlCollection($urls);
+
+        self::assertSame($urlStrings, $collection->getAsStrings());
+    }
 }

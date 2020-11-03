@@ -314,52 +314,6 @@ class ContainerTest extends TestCase
         );
     }
 
-    public function testGetRequestUrlsAsStrings(): void
-    {
-        $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
-        $httpTransaction0RequestUri
-            ->shouldReceive('__toString')
-            ->andReturn('http://example.com/0/');
-
-        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
-        $httpTransaction1RequestUri
-            ->shouldReceive('__toString')
-            ->andReturn('http://example.com/1/');
-
-        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction0Request
-            ->shouldReceive('getUri')
-            ->andReturn($httpTransaction0RequestUri);
-
-        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction1Request
-            ->shouldReceive('getUri')
-            ->andReturn($httpTransaction1RequestUri);
-
-        $httpTransaction0 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $httpTransaction1 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertEmpty($this->container->getRequestUrlsAsStrings());
-
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
-
-        $this->assertEquals(
-            [
-                'http://example.com/0/',
-                'http://example.com/1/',
-            ],
-            $this->container->getRequestUrlsAsStrings()
-        );
-    }
-
     public function invalidOffsetDataProvider(): array
     {
         return [
