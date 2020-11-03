@@ -4,33 +4,28 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
-use Psr\Http\Message\UriInterface;
-use webignition\HttpHistoryContainer\Collection\RequestCollection;
-use webignition\HttpHistoryContainer\Collection\ResponseCollection;
+use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 /**
  * @implements \ArrayAccess<int, mixed>
- * @implements \Iterator<mixed>
+ * @implements \IteratorAggregate<HttpTransaction>
  */
-class Container implements \ArrayAccess, \Iterator, \Countable
+class Container implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     public const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
     public const OFFSET_INVALID_CODE = 1;
 
-    /**
-     * @var HttpTransaction[]
-     */
-    private array $container = [];
+    private HttpTransactionCollection $transactions;
 
-    private int $iteratorIndex = 0;
-
-    /**
-     * @return HttpTransaction[]
-     */
-    public function getTransactions(): array
+    public function __construct()
     {
-        return $this->container;
+        $this->transactions = new HttpTransactionCollection();
+    }
+
+    public function getTransactions(): HttpTransactionCollection
+    {
+        return $this->transactions;
     }
 
     /**
@@ -38,116 +33,77 @@ class Container implements \ArrayAccess, \Iterator, \Countable
      * @param mixed $httpTransactionData
      *
      * @throws InvalidTransactionException
+     * @throws Collection\InvalidTransactionOffsetException
      */
     public function offsetSet($offset, $httpTransactionData): void
     {
-        $this->validateOffset($offset);
-        $httpTransaction = HttpTransaction::fromArray($httpTransactionData);
-
-        if (is_null($offset)) {
-            $this->container[] = $httpTransaction;
-        } else {
-            $this->container[$offset] = $httpTransaction;
-        }
-    }
-
-    public function offsetExists($offset): bool
-    {
-        return null !== $this->offsetGet($offset);
-    }
-
-    public function offsetUnset($offset): void
-    {
-        unset($this->container[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->container[$offset] ?? null;
-    }
-
-    public function rewind(): void
-    {
-        $this->iteratorIndex = 0;
-    }
-
-    /**
-     * @return HttpTransaction
-     */
-    public function current(): HttpTransaction
-    {
-        return $this->container[$this->iteratorIndex];
-    }
-
-    public function key(): int
-    {
-        return $this->iteratorIndex;
-    }
-
-    public function next(): void
-    {
-        ++$this->iteratorIndex;
-    }
-
-    public function valid(): bool
-    {
-        return isset($this->container[$this->iteratorIndex]);
-    }
-
-    public function getRequests(): RequestCollection
-    {
-        $requests = [];
-        array_walk($this->container, function (HttpTransaction $transaction) use (&$requests) {
-            $requests[] = $transaction->getRequest();
-        });
-
-        return new RequestCollection($requests);
-    }
-
-    public function getResponses(): ResponseCollection
-    {
-        $responses = [];
-        array_walk($this->container, function (HttpTransaction $transaction) use (&$responses) {
-            $responses[] = $transaction->getResponse();
-        });
-
-        return new ResponseCollection($responses);
-    }
-
-    /**
-     * @return UriInterface[]
-     */
-    public function getRequestUrls(): array
-    {
-        $requestUrls = [];
-        foreach ($this->getRequests() as $request) {
-            $requestUrls[] = $request->getUri();
-        }
-
-        return $requestUrls;
-    }
-
-    public function count(): int
-    {
-        return count($this->container);
-    }
-
-    public function clear(): void
-    {
-        $this->container = [];
-        $this->iteratorIndex = 0;
-    }
-
-    /**
-     * @param mixed $offset
-     */
-    private function validateOffset($offset): void
-    {
-        if (!(is_null($offset) || is_int($offset))) {
+        if (null !== $offset && false === is_int($offset)) {
             throw new \InvalidArgumentException(
                 self::OFFSET_INVALID_MESSAGE,
                 self::OFFSET_INVALID_CODE
             );
         }
+
+        $httpTransaction = HttpTransaction::fromArray($httpTransactionData);
+
+        if (is_int($offset)) {
+            $this->transactions->addAtOffset($httpTransaction, $offset);
+        } else {
+            $this->transactions->add($httpTransaction);
+        }
+    }
+
+    /**
+     * @param mixed $offset
+     *
+     * @return bool
+     */
+    public function offsetExists($offset): bool
+    {
+        if (false === is_int($offset)) {
+            return false;
+        }
+
+        return $this->offsetGet($offset) instanceof HttpTransaction;
+    }
+
+    /**
+     * @param mixed $offset
+     */
+    public function offsetUnset($offset): void
+    {
+        if (is_int($offset)) {
+            $this->transactions->remove($offset);
+        }
+    }
+
+    /**
+     * @param mixed $offset
+     *
+     * @return HttpTransaction|null
+     */
+    public function offsetGet($offset): ?HttpTransaction
+    {
+        return null === $offset
+            ? null
+            : $this->transactions->get($offset);
+    }
+
+    /**
+     * @return \Iterator<HttpTransaction>
+     */
+    public function getIterator(): \Iterator
+    {
+        return $this->transactions->getIterator();
+    }
+
+    public function count(): int
+    {
+        return count($this->transactions);
+    }
+
+    public function clear(): void
+    {
+        $this->transactions->clear();
     }
 }

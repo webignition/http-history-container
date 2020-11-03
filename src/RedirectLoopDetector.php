@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace webignition\HttpHistoryContainer;
 
 use Psr\Http\Message\ResponseInterface;
+use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 
 class RedirectLoopDetector
 {
-    private Container $container;
+    private HttpTransactionCollection $transactions;
 
-    public function __construct(Container $container)
+    public function __construct(HttpTransactionCollection $transactions)
     {
-        $this->container = $container;
+        $this->transactions = $transactions;
     }
 
     public function hasRedirectLoop(): bool
@@ -50,7 +51,7 @@ class RedirectLoopDetector
 
     private function containsAnyNonRedirectResponses(): bool
     {
-        foreach ($this->container->getResponses() as $response) {
+        foreach ($this->transactions->getResponses() as $response) {
             if ($response instanceof ResponseInterface) {
                 $statusCode = $response->getStatusCode();
 
@@ -72,7 +73,7 @@ class RedirectLoopDetector
         $groups = [];
         $currentGroup = [];
 
-        foreach ($this->container->getRequests() as $request) {
+        foreach ($this->transactions->getRequests() as $request) {
             $method = $request->getMethod();
 
             if (null === $currentMethod) {

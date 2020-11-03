@@ -8,16 +8,14 @@ use Psr\Log\LoggerInterface;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
-/**
- * @implements \ArrayAccess<int, mixed>
- * @implements \Iterator<mixed>
- */
-class LoggableContainer extends Container implements \ArrayAccess, \Iterator, \Countable
+class LoggableContainer extends Container
 {
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
+        parent::__construct();
+
         $this->logger = $logger;
     }
 
@@ -25,7 +23,9 @@ class LoggableContainer extends Container implements \ArrayAccess, \Iterator, \C
     {
         parent::offsetSet($offset, $httpTransactionData);
 
-        $transactions = $this->getTransactions();
+        $collection = $this->getTransactions();
+        $transactions = $collection->getTransactions();
+
         $currentTransaction = array_pop($transactions);
 
         if ($currentTransaction instanceof HttpTransaction) {

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
-use webignition\HttpHistoryContainer\Container;
+use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\RedirectLoopDetector;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
@@ -26,244 +26,244 @@ class RedirectLoopDetectorTest extends TestCase
     {
         return [
             'single 200 response' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(200),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        \Mockery::mock(RequestInterface::class),
+                        $this->createResponse(200),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => false,
             ],
             'contains non-redirect response (200)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(200),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        \Mockery::mock(RequestInterface::class),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        \Mockery::mock(RequestInterface::class),
+                        $this->createResponse(200),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => false,
             ],
             'contains non-redirect response (404)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(404),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        \Mockery::mock(RequestInterface::class),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        \Mockery::mock(RequestInterface::class),
+                        $this->createResponse(404),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => false,
             ],
             'only redirects, no loop (all different)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => false,
             ],
             'method change within apparent loop is not loop' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                  'expectedHasRedirectLoop' => false,
             ],
             'redirecting directly back to self' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self (with method group change)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self(with method group change, loop in first group only)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/2'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/2'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self(with method group change, loop in second group only)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createContainer([
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('HEAD', 'http://example.com/2'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/1'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
-                    [
-                        HttpTransaction::KEY_REQUEST => $this->createRequest('GET', 'http://example.com/'),
-                        HttpTransaction::KEY_RESPONSE => $this->createResponse(301),
-                        HttpTransaction::KEY_ERROR => null,
-                        HttpTransaction::KEY_OPTIONS => []
-                    ],
+                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('HEAD', 'http://example.com/2'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/1'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
+                    new HttpTransaction(
+                        $this->createRequest('GET', 'http://example.com/'),
+                        $this->createResponse(301),
+                        null,
+                        []
+                    ),
                 ])),
                 'expectedHasRedirectLoop' => true,
             ],
@@ -273,17 +273,17 @@ class RedirectLoopDetectorTest extends TestCase
     /**
      * @param array<mixed> $transactions
      *
-     * @return Container
+     * @return HttpTransactionCollection
      */
-    private function createContainer(array $transactions): Container
+    private function createCollection(array $transactions): HttpTransactionCollection
     {
-        $container = new Container();
+        $collection = new HttpTransactionCollection();
 
         foreach ($transactions as $transaction) {
-            $container[] = $transaction;
+            $collection->add($transaction);
         }
 
-        return $container;
+        return $collection;
     }
 
     private function createResponse(int $statusCode): ResponseInterface
