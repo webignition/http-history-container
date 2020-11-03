@@ -7,27 +7,13 @@ namespace webignition\HttpHistoryContainer\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
-use webignition\HttpHistoryContainer\Collection\RequestCollection;
-use webignition\HttpHistoryContainer\Collection\ResponseCollection;
+use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\Container;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 class ContainerTest extends TestCase
 {
-    /**
-     * @var Container
-     */
-    private Container $container;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->container = new Container();
-    }
-
     /**
      * @dataProvider invalidOffsetDataProvider
      *
@@ -39,40 +25,135 @@ class ContainerTest extends TestCase
         $this->expectExceptionMessage(Container::OFFSET_INVALID_MESSAGE);
         $this->expectExceptionCode(Container::OFFSET_INVALID_CODE);
 
-        $this->container->offsetSet($offset, null);
+        $container = new Container();
+        $container->offsetSet($offset, null);
     }
 
-    public function testOffsetSetInvalidHttpTransactionFoo(): void
+    public function invalidOffsetDataProvider(): array
+    {
+        return [
+            'bool' => [
+                'offset' => true,
+            ],
+            'string' => [
+                'offset' => 'foo',
+            ],
+        ];
+    }
+
+    public function testOffsetSetInvalidHttpTransaction(): void
     {
         $data = [];
 
         $this->expectExceptionObject(InvalidTransactionException::createForInvalidRequest($data));
 
-        $this->container->offsetSet(null, $data);
+        $container = new Container();
+        $container->offsetSet(null, $data);
+    }
+
+    /**
+     * @dataProvider offsetDataProvider
+     *
+     * @param Container $container
+     * @param int|null $offset
+     * @param array<mixed> $transactionData
+     * @param HttpTransactionCollection $expectedTransactionCollection
+     */
+    public function testOffsetSet(
+        Container $container,
+        ?int $offset,
+        array $transactionData,
+        HttpTransactionCollection $expectedTransactionCollection
+    ) {
+        $container->offsetSet($offset, $transactionData);
+
+        self::assertEquals($expectedTransactionCollection, $container->getTransactions());
+    }
+
+    public function offsetDataProvider(): array
+    {
+        $httpTransaction0Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
+                'value_0_options_key' => 'value_0_options_value',
+            ]
+        ];
+
+        $httpTransaction1Data = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
+                'value_1_options_key' => 'value_1_options_value',
+            ]
+        ];
+
+        return [
+            'no existing transactions; offset=null' => [
+                'container' => new Container(),
+                'offset' => null,
+                'transactionData' => $httpTransaction0Data,
+                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                    HttpTransaction::fromArray($httpTransaction0Data),
+                ]),
+            ],
+            'no existing transactions; offset=1' => [
+                'container' => new Container(),
+                'offset' => 1,
+                'transactionData' => $httpTransaction0Data,
+                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                    1 => HttpTransaction::fromArray($httpTransaction0Data),
+                ]),
+            ],
+            'has existing transaction; offset=null' => [
+                'container' => $this->createContainer([
+                    $httpTransaction0Data
+                ]),
+                'offset' => 1,
+                'transactionData' => $httpTransaction1Data,
+                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                    HttpTransaction::fromArray($httpTransaction0Data),
+                    HttpTransaction::fromArray($httpTransaction1Data),
+                ]),
+            ],
+            'has existing transaction; offset=2' => [
+                'container' => $this->createContainer([
+                    $httpTransaction0Data
+                ]),
+                'offset' => 2,
+                'transactionData' => $httpTransaction1Data,
+                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                    0 => HttpTransaction::fromArray($httpTransaction0Data),
+                    2 => HttpTransaction::fromArray($httpTransaction1Data),
+                ]),
+            ],
+        ];
+    }
+
+    public function testOffsetGetOffsetNull()
+    {
+        $container = $this->createContainer([
+            [
+                HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            ],
+        ]);
+
+        self::assertCount(1, $container);
+        self::assertNull($container->offsetGet(null));
     }
 
     /**
      * @dataProvider arrayAccessOffsetSetOffsetGetDataProvider
-     *
-     * @param array<int, array<string, mixed>> $existingHttpTransactions
-     * @param mixed $offsetSetOffset
-     * @param array<string, mixed> $offsetSetHttpTransaction
-     * @param mixed $offsetGetOffset
-     * @param HttpTransaction|null $expectedHttpTransaction
      */
-    public function testArrayAccessOffsetSetOffsetGet(
-        array $existingHttpTransactions,
-        $offsetSetOffset,
-        array $offsetSetHttpTransaction,
-        $offsetGetOffset,
+    public function testOffsetGet(
+        Container $container,
+        int $offset,
         ?HttpTransaction $expectedHttpTransaction
     ) {
-        foreach ($existingHttpTransactions as $existingOffset => $existingTransaction) {
-            $this->container->offsetSet($existingOffset, $existingTransaction);
-        }
-
-        $this->container->offsetSet($offsetSetOffset, $offsetSetHttpTransaction);
-        $this->assertEquals($expectedHttpTransaction, $this->container->offsetGet($offsetGetOffset));
+        self::assertEquals($expectedHttpTransaction, $container->offsetGet($offset));
     }
 
     public function arrayAccessOffsetSetOffsetGetDataProvider(): array
@@ -95,235 +176,113 @@ class ContainerTest extends TestCase
             ]
         ];
 
-        $existingHttpTransactions = [
-            $httpTransaction0Data,
-        ];
-
         return [
-            'no existing values; offsetSetOffset=null, offsetGetOffset=null' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => null,
+            'no existing transactions; offset=0' => [
+                'container' => new Container(),
+                'offset' => 0,
                 'expectedHttpTransaction' => null,
             ],
-            'no existing values; offsetSetOffset=null, offsetGetOffset=0' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => 0,
+            'no existing transactions; offset=1' => [
+                'container' => new Container(),
+                'offset' => 1,
+                'expectedHttpTransaction' => null,
+            ],
+            'has existing transactions; offset=0' => [
+                'container' => $this->createContainer([
+                    $httpTransaction0Data,
+                    $httpTransaction1Data,
+                ]),
+                'offset' => 0,
                 'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
-            'no existing values; offsetSetOffset=null, offsetGetOffset=1' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => null,
-            ],
-            'no existing values; offsetSetOffset=1, offsetGetOffset=null' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => null,
-                'expectedHttpTransaction' => null,
-            ],
-            'no existing values; offsetSetOffset=1, offsetGetOffset=0' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => null,
-            ],
-            'no existing values; offsetSetOffset=1, offsetGetOffset=1' => [
-                'existingHttpTransactions' => [],
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction0Data,
-                'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
-            ],
-            'has existing values; offsetSetOffset=null, offsetGetOffset=null' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => null,
-                'expectedHttpTransaction' => null,
-            ],
-            'has existing values; offsetSetOffset=null, offsetGetOffset=0' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
-            ],
-            'has existing values; offsetSetOffset=null, offsetGetOffset=1' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => null,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
-            ],
-            'has existing values; offsetSetOffset=1, offsetGetOffset=null' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => null,
-                'expectedHttpTransaction' => null,
-            ],
-            'has existing values; offsetSetOffset=1, offsetGetOffset=0' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => 0,
-                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
-            ],
-            'has existing values; offsetSetOffset=1, offsetGetOffset=1' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => 1,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => 1,
-                'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
-            ],
-            'has existing values; offsetSetOffset=0, offsetGetOffset=0' => [
-                'existingHttpTransactions' => $existingHttpTransactions,
-                'offsetSetOffset' => 0,
-                'offsetSetHttpTransaction' => $httpTransaction1Data,
-                'offsetGetOffset' => 0,
+            'has existing transactions; offset=1' => [
+                'container' => $this->createContainer([
+                    $httpTransaction0Data,
+                    $httpTransaction1Data,
+                ]),
+                'offset' => 1,
                 'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction1Data),
             ],
         ];
     }
 
-    public function testArrayAccessOffsetExistsOffsetUnset(): void
+    public function testOffsetExists()
     {
-        $httpTransaction = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertFalse($this->container->offsetExists(0));
-
-        $this->container->offsetSet(0, $httpTransaction);
-        $this->assertTrue($this->container->offsetExists(0));
-
-        $this->container->offsetUnset(0);
-        $this->assertFalse($this->container->offsetExists(0));
-    }
-
-    public function testGetRequests(): void
-    {
-        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
-
-        $httpTransaction0Data = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $httpTransaction1Data = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertEmpty($this->container->getRequests());
-
-        $this->container[] = $httpTransaction0Data;
-        $this->container[] = $httpTransaction1Data;
-
-        $this->assertEquals(
-            new RequestCollection([
-                $httpTransaction0Request,
-                $httpTransaction1Request,
-            ]),
-            $this->container->getRequests()
-        );
-    }
-
-    public function testGetResponses(): void
-    {
-        $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);
-        $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
-
         $httpTransaction0Data = [
             HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
+                'value_0_options_key' => 'value_0_options_value',
+            ]
         ];
 
         $httpTransaction1Data = [
             HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
+                'value_1_options_key' => 'value_1_options_value',
+            ]
         ];
 
-        $this->assertEmpty($this->container->getResponses());
+        $container = new Container();
+        self::assertfalse($container->offsetExists(null));
+        self::assertfalse($container->offsetExists('string'));
+        self::assertfalse($container->offsetExists(true));
+        self::assertfalse($container->offsetExists(0));
+        self::assertfalse($container->offsetExists(1));
 
-        $this->container[] = $httpTransaction0Data;
-        $this->container[] = $httpTransaction1Data;
+        $container->offsetSet(2, $httpTransaction0Data);
+        $container->offsetSet(5, $httpTransaction1Data);
+        self::assertfalse($container->offsetExists(null));
+        self::assertfalse($container->offsetExists('string'));
+        self::assertfalse($container->offsetExists(true));
+        self::assertfalse($container->offsetExists(0));
+        self::assertfalse($container->offsetExists(1));
+        self::assertTrue($container->offsetExists(2));
+        self::assertTrue($container->offsetExists(5));
+    }
 
-        $this->assertEquals(
-            new ResponseCollection([
-                $httpTransaction0Response,
-                $httpTransaction1Response,
+    public function testOffsetUnset()
+    {
+        $httpTransactionData = [
+            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransaction::KEY_ERROR => null,
+            HttpTransaction::KEY_OPTIONS => [
+                'value_0_options_key' => 'value_0_options_value',
+            ]
+        ];
+
+        $container = new Container();
+        $container->offsetSet(null, $httpTransactionData);
+
+        self::assertEquals(
+            $this->createHttpTransactionCollection([
+                HttpTransaction::fromArray($httpTransactionData),
             ]),
-            $this->container->getResponses()
+            $container->getTransactions()
         );
-    }
 
-    public function testGetRequestUrls(): void
-    {
-        $httpTransaction0RequestUri = \Mockery::mock(UriInterface::class);
-        $httpTransaction0RequestUri
-            ->shouldReceive('__toString')
-            ->andReturn('http://example.com/0/');
+        $container->offsetUnset(null);
+        $container->offsetUnset('string');
+        $container->offsetUnset(true);
+        $container->offsetUnset(-1);
 
-        $httpTransaction1RequestUri = \Mockery::mock(UriInterface::class);
-        $httpTransaction1RequestUri
-            ->shouldReceive('__toString')
-            ->andReturn('http://example.com/1/');
-
-        $httpTransaction0Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction0Request
-            ->shouldReceive('getUri')
-            ->andReturn($httpTransaction0RequestUri);
-
-        $httpTransaction1Request = \Mockery::mock(RequestInterface::class);
-        $httpTransaction1Request
-            ->shouldReceive('getUri')
-            ->andReturn($httpTransaction1RequestUri);
-
-        $httpTransaction0 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction0Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $httpTransaction1 = [
-            HttpTransaction::KEY_REQUEST => $httpTransaction1Request,
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-        ];
-
-        $this->assertEmpty($this->container->getRequestUrls());
-
-        $this->container[] = $httpTransaction0;
-        $this->container[] = $httpTransaction1;
-
-        $this->assertEquals(
-            [
-                $httpTransaction0RequestUri,
-                $httpTransaction1RequestUri,
-            ],
-            $this->container->getRequestUrls()
+        self::assertEquals(
+            $this->createHttpTransactionCollection([
+                HttpTransaction::fromArray($httpTransactionData),
+            ]),
+            $container->getTransactions()
         );
-    }
 
-    public function invalidOffsetDataProvider(): array
-    {
-        return [
-            'bool' => [
-                'offset' => true,
-            ],
-            'string' => [
-                'offset' => 'foo',
-            ],
-        ];
+        $container->offsetUnset(0);
+
+        self::assertEquals(
+            $this->createHttpTransactionCollection([]),
+            $container->getTransactions()
+        );
     }
 
     public function testIterator(): void
@@ -346,17 +305,19 @@ class ContainerTest extends TestCase
             HttpTransaction::fromArray($httpTransaction1Data),
         ];
 
-        $this->container[] = $httpTransaction0Data;
-        $this->container[] = $httpTransaction1Data;
+        $container = new Container();
+
+        $container[] = $httpTransaction0Data;
+        $container[] = $httpTransaction1Data;
 
         $iteratedTransactionCount = 0;
 
-        foreach ($this->container as $httpTransactionIndex => $httpTransaction) {
+        foreach ($container as $httpTransactionIndex => $httpTransaction) {
             $iteratedTransactionCount++;
-            $this->assertEquals($httpTransactions[$httpTransactionIndex], $httpTransaction);
+            self::assertEquals($httpTransactions[$httpTransactionIndex], $httpTransaction);
         }
 
-        $this->assertEquals(2, $iteratedTransactionCount);
+        self::assertEquals(2, $iteratedTransactionCount);
     }
 
     public function testClear(): void
@@ -366,15 +327,44 @@ class ContainerTest extends TestCase
             HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
-        $this->container[] = $httpTransaction;
-        $this->assertCount(1, $this->container);
+        $container = new Container();
 
-        $this->container->clear();
-        $this->assertCount(0, $this->container);
+        $container[] = $httpTransaction;
+        self::assertCount(1, $container);
+
+        $container->clear();
+        self::assertCount(0, $container);
     }
 
-    public function testGetTransactions(): void
+    /**
+     * @param HttpTransaction[] $transactions
+     *
+     * @return HttpTransactionCollection
+     */
+    private function createHttpTransactionCollection(array $transactions): HttpTransactionCollection
     {
-        $this->assertEquals([], $this->container->getTransactions());
+        $collection = new HttpTransactionCollection();
+
+        foreach ($transactions as $index => $transaction) {
+            $collection->addAtOffset($transaction, $index);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param array<mixed> $transactionDataSets
+     *
+     * @return Container
+     */
+    private function createContainer(array $transactionDataSets): Container
+    {
+        $container = new Container();
+
+        foreach ($transactionDataSets as $index => $transactionData) {
+            $container->offsetSet($index, $transactionData);
+        }
+
+        return $container;
     }
 }
