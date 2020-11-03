@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests;
+namespace webignition\HttpHistoryContainer\Tests\Transaction;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use webignition\HttpHistoryContainer\HttpTransaction;
-use webignition\HttpHistoryContainer\LoggableTransaction;
 use webignition\HttpHistoryContainer\Message\LoggableRequest;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
+use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 class LoggableTransactionTest extends TestCase
 {

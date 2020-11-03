@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer;
+namespace webignition\HttpHistoryContainer\Transaction;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use webignition\HttpHistoryContainer\InvalidTransactionException;
 
 class HttpTransaction
 {

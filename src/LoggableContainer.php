@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace webignition\HttpHistoryContainer;
 
 use Psr\Log\LoggerInterface;
+use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 /**
  * @implements \ArrayAccess<int, mixed>
