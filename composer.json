@@ -22,9 +22,11 @@
         }
     },
     "scripts": {
+        "cs-ecs": "./vendor/bin/ecs check src tests --ansi --no-progress-bar --config ecs.php",
+        "cs-phpcs": "./vendor/bin/phpcs",
         "cs": [
-            "./vendor/bin/ecs check src tests --ansi --config ecs.php",
-            "./vendor/bin/phpcs"
+            "@cs-ecs",
+            "@cs-phpcs"
         ],
         "cs-fix": [
             "./vendor/bin/ecs check src tests --ansi --config ecs.php --fix"
