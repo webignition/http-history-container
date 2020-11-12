@@ -13,7 +13,7 @@ use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
  */
 class Container implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    public const OFFSET_INVALID_MESSAGE = 'Invalid offset; must be an integer or null';
+    public const OFFSET_INVALID_MESSAGE = 'Invalid offset; must always be null';
     public const OFFSET_INVALID_CODE = 1;
 
     private HttpTransactionCollection $transactions;
@@ -33,11 +33,10 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param mixed $httpTransactionData
      *
      * @throws InvalidTransactionException
-     * @throws Collection\InvalidTransactionOffsetException
      */
     public function offsetSet($offset, $httpTransactionData): void
     {
-        if (null !== $offset && false === is_int($offset)) {
+        if (null !== $offset) {
             throw new \InvalidArgumentException(
                 self::OFFSET_INVALID_MESSAGE,
                 self::OFFSET_INVALID_CODE
@@ -46,11 +45,7 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
 
         $httpTransaction = HttpTransaction::fromArray($httpTransactionData);
 
-        if (is_int($offset)) {
-            $this->transactions->addAtOffset($httpTransaction, $offset);
-        } else {
-            $this->transactions->add($httpTransaction);
-        }
+        $this->transactions->add($httpTransaction);
     }
 
     /**

@@ -55,17 +55,15 @@ class ContainerTest extends TestCase
      * @dataProvider offsetDataProvider
      *
      * @param Container $container
-     * @param int|null $offset
      * @param array<mixed> $transactionData
      * @param HttpTransactionCollection $expectedTransactionCollection
      */
     public function testOffsetSet(
         Container $container,
-        ?int $offset,
         array $transactionData,
         HttpTransactionCollection $expectedTransactionCollection
     ) {
-        $container->offsetSet($offset, $transactionData);
+        $container->offsetSet(null, $transactionData);
 
         self::assertEquals($expectedTransactionCollection, $container->getTransactions());
     }
@@ -91,42 +89,21 @@ class ContainerTest extends TestCase
         ];
 
         return [
-            'no existing transactions; offset=null' => [
+            'no existing transactions' => [
                 'container' => new Container(),
-                'offset' => null,
                 'transactionData' => $httpTransaction0Data,
                 'expectedTransactionCollection' => $this->createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                 ]),
             ],
-            'no existing transactions; offset=1' => [
-                'container' => new Container(),
-                'offset' => 1,
-                'transactionData' => $httpTransaction0Data,
-                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
-                    1 => HttpTransaction::fromArray($httpTransaction0Data),
-                ]),
-            ],
-            'has existing transaction; offset=null' => [
+            'has existing transaction' => [
                 'container' => $this->createContainer([
                     $httpTransaction0Data
                 ]),
-                'offset' => 1,
                 'transactionData' => $httpTransaction1Data,
                 'expectedTransactionCollection' => $this->createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                     HttpTransaction::fromArray($httpTransaction1Data),
-                ]),
-            ],
-            'has existing transaction; offset=2' => [
-                'container' => $this->createContainer([
-                    $httpTransaction0Data
-                ]),
-                'offset' => 2,
-                'transactionData' => $httpTransaction1Data,
-                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
-                    0 => HttpTransaction::fromArray($httpTransaction0Data),
-                    2 => HttpTransaction::fromArray($httpTransaction1Data),
                 ]),
             ],
         ];
@@ -233,15 +210,13 @@ class ContainerTest extends TestCase
         self::assertfalse($container->offsetExists(0));
         self::assertfalse($container->offsetExists(1));
 
-        $container->offsetSet(2, $httpTransaction0Data);
-        $container->offsetSet(5, $httpTransaction1Data);
+        $container->offsetSet(null, $httpTransaction0Data);
+        $container->offsetSet(null, $httpTransaction1Data);
         self::assertfalse($container->offsetExists(null));
         self::assertfalse($container->offsetExists('string'));
         self::assertfalse($container->offsetExists(true));
-        self::assertfalse($container->offsetExists(0));
-        self::assertfalse($container->offsetExists(1));
-        self::assertTrue($container->offsetExists(2));
-        self::assertTrue($container->offsetExists(5));
+        self::assertTrue($container->offsetExists(0));
+        self::assertTrue($container->offsetExists(1));
     }
 
     public function testOffsetUnset()
@@ -345,8 +320,8 @@ class ContainerTest extends TestCase
     {
         $collection = new HttpTransactionCollection();
 
-        foreach ($transactions as $index => $transaction) {
-            $collection->addAtOffset($transaction, $index);
+        foreach ($transactions as $transaction) {
+            $collection->add($transaction);
         }
 
         return $collection;
@@ -361,8 +336,8 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
 
-        foreach ($transactionDataSets as $index => $transactionData) {
-            $container->offsetSet($index, $transactionData);
+        foreach ($transactionDataSets as $transactionData) {
+            $container->offsetSet(null, $transactionData);
         }
 
         return $container;
