@@ -313,7 +313,7 @@ class ContainerTest extends TestCase
         ObjectReflector::setProperty(
             $collection,
             HttpTransactionCollection::class,
-            'periodCollection',
+            'periods',
             new PeriodCollection()
         );
     }
