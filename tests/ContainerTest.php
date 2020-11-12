@@ -320,8 +320,8 @@ class ContainerTest extends TestCase
     {
         $collection = new HttpTransactionCollection();
 
-        foreach ($transactions as $index => $transaction) {
-            $collection->addAtOffset($transaction, $index);
+        foreach ($transactions as $transaction) {
+            $collection->add($transaction);
         }
 
         return $collection;

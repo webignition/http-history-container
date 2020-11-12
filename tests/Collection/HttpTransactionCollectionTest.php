@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
-use webignition\HttpHistoryContainer\Collection\InvalidTransactionOffsetException;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 
 class HttpTransactionCollectionTest extends TestCase
@@ -37,40 +36,6 @@ class HttpTransactionCollectionTest extends TestCase
         }
 
         self::assertSame($transactions, $this->collection->getTransactions());
-    }
-
-    public function testAddAtOffsetInvalidOffset(): void
-    {
-        $transaction = \Mockery::mock(HttpTransaction::class);
-        $offset = -1;
-
-        $this->expectExceptionObject(new InvalidTransactionOffsetException($transaction, $offset));
-
-        $this->collection->addAtOffset(\Mockery::mock(HttpTransaction::class), $offset);
-    }
-
-    public function testAddAtOffset()
-    {
-        self::assertCount(0, $this->collection);
-
-        $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-        ];
-
-        $indices = [1, 3, 5];
-
-        foreach ($transactions as $transactionIndex => $transaction) {
-            $this->collection->addAtOffset($transaction, $indices[$transactionIndex]);
-        }
-
-        self::assertCount(count($transactions), $this->collection);
-
-        $storedTransactions = $this->collection->getTransactions();
-
-        self::assertSame($indices, array_keys($storedTransactions));
-        self::assertSame($transactions, array_values($storedTransactions));
     }
 
     public function testGet()

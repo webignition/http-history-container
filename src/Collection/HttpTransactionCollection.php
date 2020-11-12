@@ -21,21 +21,6 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
         $this->transactions[] = $transaction;
     }
 
-    /**
-     * @param HttpTransaction $transaction
-     * @param int $offset
-     *
-     * @throws InvalidTransactionOffsetException
-     */
-    public function addAtOffset(HttpTransaction $transaction, int $offset): void
-    {
-        if ($offset < 0) {
-            throw new InvalidTransactionOffsetException($transaction, $offset);
-        }
-
-        $this->transactions[$offset] = $transaction;
-    }
-
     public function get(int $offset): ?HttpTransaction
     {
         return $this->transactions[$offset] ?? null;
