@@ -88,11 +88,9 @@ class LoggableResponseTest extends TestCase
         $expectedResponse = $expectedLoggableResponse->getResponse();
         self::assertInstanceOf(ResponseInterface::class, $expectedResponse);
 
-        if ($response instanceof ResponseInterface && $expectedResponse instanceof ResponseInterface) {
-            self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
-            self::assertSame($expectedResponse->getHeaders(), $response->getHeaders());
-            self::assertSame($expectedResponse->getBody()->getContents(), $response->getBody()->getContents());
-        }
+        self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
+        self::assertSame($expectedResponse->getHeaders(), $response->getHeaders());
+        self::assertSame($expectedResponse->getBody()->getContents(), $response->getBody()->getContents());
     }
 
     public function createFromJsonDataProvider(): array
