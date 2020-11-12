@@ -219,47 +219,6 @@ class ContainerTest extends TestCase
         self::assertTrue($container->offsetExists(1));
     }
 
-    public function testOffsetUnset()
-    {
-        $httpTransactionData = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
-                'value_0_options_key' => 'value_0_options_value',
-            ]
-        ];
-
-        $container = new Container();
-        $container->offsetSet(null, $httpTransactionData);
-
-        self::assertEquals(
-            $this->createHttpTransactionCollection([
-                HttpTransaction::fromArray($httpTransactionData),
-            ]),
-            $container->getTransactions()
-        );
-
-        $container->offsetUnset(null);
-        $container->offsetUnset('string');
-        $container->offsetUnset(true);
-        $container->offsetUnset(-1);
-
-        self::assertEquals(
-            $this->createHttpTransactionCollection([
-                HttpTransaction::fromArray($httpTransactionData),
-            ]),
-            $container->getTransactions()
-        );
-
-        $container->offsetUnset(0);
-
-        self::assertEquals(
-            $this->createHttpTransactionCollection([]),
-            $container->getTransactions()
-        );
-    }
-
     public function testIterator(): void
     {
         $httpTransaction0Response = \Mockery::mock(ResponseInterface::class);

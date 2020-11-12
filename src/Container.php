@@ -67,9 +67,6 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetUnset($offset): void
     {
-        if (is_int($offset)) {
-            $this->transactions->remove($offset);
-        }
     }
 
     /**
