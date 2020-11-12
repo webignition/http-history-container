@@ -148,4 +148,19 @@ class HttpTransactionCollectionTest extends TestCase
         $this->collection->clear();
         self::assertCount(0, $this->collection);
     }
+
+    public function testGetPeriods()
+    {
+        $periods = $this->collection->getPeriods();
+        self::assertCount(0, $periods);
+
+        $this->collection->add(\Mockery::mock(HttpTransaction::class));
+        self::assertCount(1, $periods);
+
+        $this->collection->add(\Mockery::mock(HttpTransaction::class));
+        self::assertCount(2, $periods);
+
+        $this->collection->add(\Mockery::mock(HttpTransaction::class));
+        self::assertCount(3, $periods);
+    }
 }
