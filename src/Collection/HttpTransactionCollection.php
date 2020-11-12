@@ -16,9 +16,17 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
      */
     private array $transactions = [];
 
+    private PeriodCollection $periodCollection;
+
+    public function __construct()
+    {
+        $this->periodCollection = new PeriodCollection();
+    }
+
     public function add(HttpTransaction $transaction): void
     {
         $this->transactions[] = $transaction;
+        $this->periodCollection->add();
     }
 
     public function get(int $offset): ?HttpTransaction

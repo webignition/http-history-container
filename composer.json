@@ -55,7 +55,8 @@
         "phpstan/phpstan-mockery": "^0.12.7",
         "symplify/easy-coding-standard": "^8.3",
         "monolog/monolog": "^2.1",
-        "phpstan/phpstan-phpunit": "^0.12.16"
+        "phpstan/phpstan-phpunit": "^0.12.16",
+        "webignition/object-reflector": "^0.2.0"
     },
     "minimum-stability":"stable"
 }

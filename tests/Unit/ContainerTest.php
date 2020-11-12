@@ -8,9 +8,11 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
+use webignition\HttpHistoryContainer\Collection\PeriodCollection;
 use webignition\HttpHistoryContainer\Container;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\ObjectReflector\ObjectReflector;
 
 class ContainerTest extends TestCase
 {
@@ -56,16 +58,20 @@ class ContainerTest extends TestCase
      *
      * @param Container $container
      * @param array<mixed> $transactionData
-     * @param HttpTransactionCollection $expectedTransactionCollection
+     * @param HttpTransactionCollection $expectedTransactions
      */
     public function testOffsetSet(
         Container $container,
         array $transactionData,
-        HttpTransactionCollection $expectedTransactionCollection
+        HttpTransactionCollection $expectedTransactions
     ) {
         $container->offsetSet(null, $transactionData);
+        $transactions = $container->getTransactions();
 
-        self::assertEquals($expectedTransactionCollection, $container->getTransactions());
+        $this->setTransactionPeriodCollectionToEmpty($transactions);
+        $this->setTransactionPeriodCollectionToEmpty($expectedTransactions);
+
+        self::assertEquals($expectedTransactions, $transactions);
     }
 
     public function offsetDataProvider(): array
@@ -92,7 +98,7 @@ class ContainerTest extends TestCase
             'no existing transactions' => [
                 'container' => new Container(),
                 'transactionData' => $httpTransaction0Data,
-                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                'expectedTransactions' => $this->createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                 ]),
             ],
@@ -101,7 +107,7 @@ class ContainerTest extends TestCase
                     $httpTransaction0Data
                 ]),
                 'transactionData' => $httpTransaction1Data,
-                'expectedTransactionCollection' => $this->createHttpTransactionCollection([
+                'expectedTransactions' => $this->createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                     HttpTransaction::fromArray($httpTransaction1Data),
                 ]),
@@ -300,5 +306,15 @@ class ContainerTest extends TestCase
         }
 
         return $container;
+    }
+
+    private function setTransactionPeriodCollectionToEmpty(HttpTransactionCollection $collection): void
+    {
+        ObjectReflector::setProperty(
+            $collection,
+            HttpTransactionCollection::class,
+            'periodCollection',
+            new PeriodCollection()
+        );
     }
 }
