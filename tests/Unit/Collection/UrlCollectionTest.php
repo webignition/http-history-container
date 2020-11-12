@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests\Collection;
+namespace webignition\HttpHistoryContainer\Tests\Unit\Collection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
