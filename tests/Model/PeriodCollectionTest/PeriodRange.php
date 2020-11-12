@@ -7,9 +7,9 @@ namespace webignition\HttpHistoryContainer\Tests\Model\PeriodCollectionTest;
 class PeriodRange
 {
     private int $lower;
-    private int $upper;
+    private ?int $upper;
 
-    public function __construct(int $lower, int $upper)
+    public function __construct(int $lower, ?int $upper = null)
     {
         $this->lower = $lower;
         $this->upper = $upper;
@@ -20,7 +20,7 @@ class PeriodRange
         return $this->lower;
     }
 
-    public function getUpper(): int
+    public function getUpper(): ?int
     {
         return $this->upper;
     }

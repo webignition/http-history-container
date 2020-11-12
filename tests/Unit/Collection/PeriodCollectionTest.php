@@ -33,7 +33,11 @@ class PeriodCollectionTest extends TestCase
             $period = $periods[$expectedRangeIndex] ?? null;
 
             self::assertGreaterThanOrEqual($expectedPeriodRange->getLower(), $period);
-            self::assertLessThanOrEqual($expectedPeriodRange->getUpper(), $period);
+
+            $upper = $expectedPeriodRange->getUpper();
+            if (is_int($upper)) {
+                self::assertLessThanOrEqual($upper, $period);
+            }
         }
     }
 
