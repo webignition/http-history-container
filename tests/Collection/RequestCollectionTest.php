@@ -35,7 +35,7 @@ class RequestCollectionTest extends TestCase
     public function testCountable(RequestCollection $collection, int $expectedCount)
     {
         self::assertInstanceOf(\Countable::class, $collection);
-        self::assertSame($expectedCount, count($collection));
+        self::assertCount($expectedCount, $collection);
     }
 
     public function countableDataProvider(): array
