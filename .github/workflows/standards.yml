@@ -1,0 +1,40 @@
+name: Coding Standards
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  ecs:
+    name: Easy Coding Standard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download dependencies
+        uses: php-actions/composer@v2
+        with:
+          args: --ignore-platform-reqs --quiet
+
+      - name: Run ECS
+        run: composer cs-ecs
+
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download dependencies
+        uses: php-actions/composer@v2
+        with:
+          args: --ignore-platform-reqs --quiet
+
+      - name: Run PHPCS
+        run: composer cs-phpcs
