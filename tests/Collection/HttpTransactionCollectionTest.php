@@ -60,32 +60,6 @@ class HttpTransactionCollectionTest extends TestCase
         }
     }
 
-    public function testRemove()
-    {
-        self::assertCount(0, $this->collection);
-
-        $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-        ];
-
-        foreach ($transactions as $transaction) {
-            $this->collection->add($transaction);
-        }
-
-        self::assertSame($transactions, $this->collection->getTransactions());
-
-        $this->collection->remove(2);
-        self::assertSame(array_slice($transactions, 0, 2), $this->collection->getTransactions());
-
-        $this->collection->remove(1);
-        self::assertSame(array_slice($transactions, 0, 1), $this->collection->getTransactions());
-
-        $this->collection->remove(0);
-        self::assertSame([], $this->collection->getTransactions());
-    }
-
     public function testIterator()
     {
         $transactions = [

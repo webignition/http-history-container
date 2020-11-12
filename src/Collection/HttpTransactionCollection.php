@@ -26,11 +26,6 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
         return $this->transactions[$offset] ?? null;
     }
 
-    public function remove(int $offset): void
-    {
-        unset($this->transactions[$offset]);
-    }
-
     /**
      * @return HttpTransaction[]
      */
