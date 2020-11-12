@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests;
+namespace webignition\HttpHistoryContainer\Tests\Unit;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;

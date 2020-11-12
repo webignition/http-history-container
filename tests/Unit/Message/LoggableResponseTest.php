@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace webignition\HttpHistoryContainer\Tests\Message;
+namespace webignition\HttpHistoryContainer\Tests\Unit\Message;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
