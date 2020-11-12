@@ -22,9 +22,11 @@
         }
     },
     "scripts": {
+        "cs-ecs": "./vendor/bin/ecs check src tests --ansi --no-progress-bar --config ecs.php",
+        "cs-phpcs": "./vendor/bin/phpcs",
         "cs": [
-            "./vendor/bin/ecs check src tests --ansi --config ecs.php",
-            "./vendor/bin/phpcs"
+            "@cs-ecs",
+            "@cs-phpcs"
         ],
         "cs-fix": [
             "./vendor/bin/ecs check src tests --ansi --config ecs.php --fix"
@@ -52,7 +54,8 @@
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-mockery": "^0.12.7",
         "symplify/easy-coding-standard": "^8.3",
-        "monolog/monolog": "^2.1"
+        "monolog/monolog": "^2.1",
+        "phpstan/phpstan-phpunit": "^0.12.16"
     },
     "minimum-stability":"stable"
 }
