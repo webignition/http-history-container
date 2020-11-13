@@ -11,6 +11,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use webignition\HttpHistoryContainer\LoggableContainer;
+use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 class LoggableContainerTest extends TestCase
 {
@@ -65,7 +66,42 @@ class LoggableContainerTest extends TestCase
             $decodedMessages[] = json_decode($loggedMessage, true);
         }
 
-        self::assertEquals($expectedDecodedMessages, $decodedMessages);
+        self::assertCount(count($expectedDecodedMessages), $decodedMessages);
+
+        $lastPeriod = null;
+        foreach ($decodedMessages as $decodedMessage) {
+            self::assertIsArray($decodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $decodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_RESPONSE, $decodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_PERIOD, $decodedMessage);
+
+            $period = $decodedMessage[LoggableTransaction::KEY_PERIOD];
+
+            if (null === $lastPeriod) {
+                self::assertSame(0, $period);
+            } else {
+                self::assertGreaterThan($lastPeriod, $period);
+            }
+
+            $lastPeriod = $period;
+        }
+
+        foreach ($expectedDecodedMessages as $messageIndex => $expectedDecodedMessage) {
+            self::assertIsArray($expectedDecodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $expectedDecodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_RESPONSE, $expectedDecodedMessage);
+
+            $decodedMessage = $decodedMessages[$messageIndex];
+            self::assertEquals(
+                $expectedDecodedMessage[LoggableTransaction::KEY_REQUEST],
+                $decodedMessage[LoggableTransaction::KEY_REQUEST]
+            );
+
+            self::assertEquals(
+                $expectedDecodedMessage[LoggableTransaction::KEY_RESPONSE],
+                $decodedMessage[LoggableTransaction::KEY_RESPONSE]
+            );
+        }
     }
 
     public function logTransactionsDataProvider(): array

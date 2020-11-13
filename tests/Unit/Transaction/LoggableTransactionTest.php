@@ -38,11 +38,13 @@ class LoggableTransactionTest extends TestCase
                         new Response(),
                         null,
                         []
-                    )
+                    ),
+                    100
                 ),
                 'expectedSerializedData' => [
                     'request' => new LoggableRequest($request),
                     'response' => new LoggableResponse($response),
+                    'period' => 100,
                 ],
             ],
         ];
@@ -68,6 +70,7 @@ class LoggableTransactionTest extends TestCase
                 'serializedTransaction' => json_encode([
                     'request' => new LoggableRequest($request),
                     'response' => new LoggableResponse($response),
+                    'period' => 200,
                 ]),
                 'transaction' => new LoggableTransaction(
                     new HttpTransaction(
@@ -75,7 +78,8 @@ class LoggableTransactionTest extends TestCase
                         new Response(),
                         null,
                         []
-                    )
+                    ),
+                    200
                 ),
             ],
         ];

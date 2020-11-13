@@ -25,17 +25,19 @@ class LoggableContainer extends Container
 
         $collection = $this->getTransactions();
         $transactions = $collection->getTransactions();
+        $periods = $collection->getPeriods()->getPeriodsInMicroseconds();
 
         $currentTransaction = array_pop($transactions);
+        $period = (int) array_pop($periods);
 
         if ($currentTransaction instanceof HttpTransaction) {
-            $this->logTransaction($currentTransaction);
+            $this->logTransaction($currentTransaction, $period);
         }
     }
 
-    private function logTransaction(HttpTransaction $transaction): void
+    private function logTransaction(HttpTransaction $transaction, int $period): void
     {
-        $loggableTransaction = new LoggableTransaction($transaction);
+        $loggableTransaction = new LoggableTransaction($transaction, $period);
 
         $this->logger->debug((string) json_encode($loggableTransaction));
     }
