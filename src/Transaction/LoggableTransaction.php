@@ -11,15 +11,18 @@ class LoggableTransaction implements \JsonSerializable
 {
     public const KEY_REQUEST = 'request';
     public const KEY_RESPONSE = 'response';
+    public const KEY_PERIOD = 'period';
 
     private const DEFAULT_EMPTY_REQUEST_DATA = [];
     private const DEFAULT_EMPTY_RESPONSE_DATA = [];
 
     private HttpTransaction $transaction;
+    private int $period;
 
-    public function __construct(HttpTransaction $transaction)
+    public function __construct(HttpTransaction $transaction, int $period)
     {
         $this->transaction = $transaction;
+        $this->period = $period;
     }
 
     public static function fromJson(string $transaction): self
@@ -38,6 +41,7 @@ class LoggableTransaction implements \JsonSerializable
 
         $loggableRequest = LoggableRequest::fromJson((string) json_encode($requestData));
         $loggableResponse = LoggableResponse::fromJson((string) json_encode($responseData));
+        $period = (int) ($data[self::KEY_PERIOD] ?? 0);
 
         return new LoggableTransaction(
             new HttpTransaction(
@@ -45,7 +49,8 @@ class LoggableTransaction implements \JsonSerializable
                 $loggableResponse->getResponse(),
                 null,
                 []
-            )
+            ),
+            $period
         );
     }
 
@@ -62,6 +67,7 @@ class LoggableTransaction implements \JsonSerializable
         return [
             self::KEY_REQUEST => new LoggableRequest($this->transaction->getRequest()),
             self::KEY_RESPONSE => new LoggableResponse($this->transaction->getResponse()),
+            self::KEY_PERIOD => $this->period,
         ];
     }
 }
