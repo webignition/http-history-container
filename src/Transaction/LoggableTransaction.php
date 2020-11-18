@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Transaction;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Message\LoggableRequest;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
 
-class LoggableTransaction implements \JsonSerializable
+class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
 {
     public const KEY_REQUEST = 'request';
     public const KEY_RESPONSE = 'response';
@@ -54,9 +56,24 @@ class LoggableTransaction implements \JsonSerializable
         );
     }
 
-    public function getTransaction(): HttpTransaction
+    public function getRequest(): RequestInterface
     {
-        return $this->transaction;
+        return $this->transaction->getRequest();
+    }
+
+    public function getResponse(): ?ResponseInterface
+    {
+        return $this->transaction->getResponse();
+    }
+
+    public function getError()
+    {
+        return $this->transaction->getError();
+    }
+
+    public function getOptions(): array
+    {
+        return $this->transaction->getOptions();
     }
 
     /**
