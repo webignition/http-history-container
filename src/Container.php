@@ -6,10 +6,11 @@ namespace webignition\HttpHistoryContainer;
 
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 /**
  * @implements \ArrayAccess<int, mixed>
- * @implements \IteratorAggregate<HttpTransaction>
+ * @implements \IteratorAggregate<HttpTransactionInterface>
  */
 class Container implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -59,7 +60,7 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
             return false;
         }
 
-        return $this->offsetGet($offset) instanceof HttpTransaction;
+        return $this->offsetGet($offset) instanceof HttpTransactionInterface;
     }
 
     /**
@@ -72,9 +73,9 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @param mixed $offset
      *
-     * @return HttpTransaction|null
+     * @return HttpTransactionInterface|null
      */
-    public function offsetGet($offset): ?HttpTransaction
+    public function offsetGet($offset): ?HttpTransactionInterface
     {
         return null === $offset
             ? null
@@ -82,7 +83,7 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \Iterator<HttpTransaction>
+     * @return \Iterator<HttpTransactionInterface>
      */
     public function getIterator(): \Iterator
     {
