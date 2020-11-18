@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace webignition\HttpHistoryContainer\Collection;
 
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
+use webignition\HttpHistoryContainer\Transaction\WithPeriodInterface;
 
 /**
  * @implements \IteratorAggregate<int, HttpTransactionInterface>
@@ -31,7 +32,12 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
     public function add(HttpTransactionInterface $transaction): void
     {
         $this->transactions[] = $transaction;
-        $this->periods->add();
+
+        if ($transaction instanceof WithPeriodInterface) {
+            $this->periods->append($transaction->getPeriod());
+        } else {
+            $this->periods->add();
+        }
     }
 
     public function get(int $offset): ?HttpTransactionInterface

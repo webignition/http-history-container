@@ -8,7 +8,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
+use webignition\HttpHistoryContainer\Collection\PeriodCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
+use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 class HttpTransactionCollectionTest extends TestCase
 {
@@ -26,9 +29,9 @@ class HttpTransactionCollectionTest extends TestCase
         self::assertCount(0, $this->collection);
 
         $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
         ];
 
         foreach ($transactions as $transaction) {
@@ -43,9 +46,9 @@ class HttpTransactionCollectionTest extends TestCase
         self::assertCount(0, $this->collection);
 
         $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
         ];
 
         foreach ($transactions as $transaction) {
@@ -63,9 +66,9 @@ class HttpTransactionCollectionTest extends TestCase
     public function testIterator()
     {
         $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
         ];
 
         foreach ($transactions as $transaction) {
@@ -134,9 +137,9 @@ class HttpTransactionCollectionTest extends TestCase
         self::assertCount(0, $this->collection);
 
         $transactions = [
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
-            \Mockery::mock(HttpTransaction::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
+            \Mockery::mock(HttpTransactionInterface::class),
         ];
 
         foreach ($transactions as $transaction) {
@@ -149,18 +152,60 @@ class HttpTransactionCollectionTest extends TestCase
         self::assertCount(0, $this->collection);
     }
 
-    public function testGetPeriods()
+    /**
+     * @dataProvider getPeriodsDataProvider
+     *
+     * @param HttpTransactionInterface[] $transactions
+     * @param callable $assertions
+     */
+    public function testGetPeriods(array $transactions, callable $assertions)
     {
-        $periods = $this->collection->getPeriods();
-        self::assertCount(0, $periods);
+        foreach ($transactions as $transaction) {
+            $this->collection->add($transaction);
+        }
 
-        $this->collection->add(\Mockery::mock(HttpTransaction::class));
-        self::assertCount(1, $periods);
+        $assertions($this->collection->getPeriods());
+    }
 
-        $this->collection->add(\Mockery::mock(HttpTransaction::class));
-        self::assertCount(2, $periods);
+    public function getPeriodsDataProvider(): array
+    {
+        return [
+            'non-timed transactions' => [
+                'transactions' => [
+                    \Mockery::mock(HttpTransactionInterface::class),
+                    \Mockery::mock(HttpTransactionInterface::class),
+                    \Mockery::mock(HttpTransactionInterface::class),
+                ],
+                'assertions' => function (PeriodCollection $periodCollection) {
+                    self::assertCount(3, $periodCollection);
 
-        $this->collection->add(\Mockery::mock(HttpTransaction::class));
-        self::assertCount(3, $periods);
+                    $currentPeriod = 0;
+                    foreach ($periodCollection as $period) {
+                        self::assertLessThanOrEqual(10, $period - $currentPeriod);
+                        $currentPeriod = $period;
+                    }
+                },
+            ],
+            'timed transactions' => [
+                'transactions' => [
+                    $this->createLoggableTransactionWithPeriod(0),
+                    $this->createLoggableTransactionWithPeriod(10),
+                    $this->createLoggableTransactionWithPeriod(200),
+                ],
+                'assertions' => function (PeriodCollection $periodCollection) {
+                    self::assertSame([0, 10, 200], $periodCollection->getPeriodsInMicroseconds());
+                },
+            ],
+        ];
+    }
+
+    private function createLoggableTransactionWithPeriod(int $period): LoggableTransaction
+    {
+        $transaction = \Mockery::mock(LoggableTransaction::class);
+        $transaction
+            ->shouldReceive('getPeriod')
+            ->andReturn($period);
+
+        return $transaction;
     }
 }

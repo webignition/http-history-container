@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Message\LoggableRequest;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
 
-class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
+class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface, WithPeriodInterface
 {
     public const KEY_REQUEST = 'request';
     public const KEY_RESPONSE = 'response';
@@ -74,6 +74,11 @@ class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
     public function getOptions(): array
     {
         return $this->transaction->getOptions();
+    }
+
+    public function getPeriod(): int
+    {
+        return $this->period;
     }
 
     /**
