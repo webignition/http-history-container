@@ -12,6 +12,7 @@ use webignition\HttpHistoryContainer\Collection\PeriodCollection;
 use webignition\HttpHistoryContainer\Container;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class ContainerTest extends TestCase
@@ -77,19 +78,19 @@ class ContainerTest extends TestCase
     public function offsetDataProvider(): array
     {
         $httpTransaction0Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_0_options_key' => 'value_0_options_value',
             ]
         ];
 
         $httpTransaction1Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_1_options_key' => 'value_1_options_value',
             ]
         ];
@@ -119,8 +120,8 @@ class ContainerTest extends TestCase
     {
         $container = $this->createContainer([
             [
-                HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-                HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+                HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+                HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
             ],
         ]);
 
@@ -142,19 +143,19 @@ class ContainerTest extends TestCase
     public function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {
         $httpTransaction0Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_0_options_key' => 'value_0_options_value',
             ]
         ];
 
         $httpTransaction1Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_1_options_key' => 'value_1_options_value',
             ]
         ];
@@ -192,19 +193,19 @@ class ContainerTest extends TestCase
     public function testOffsetExists()
     {
         $httpTransaction0Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_0_options_key' => 'value_0_options_value',
             ]
         ];
 
         $httpTransaction1Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
-            HttpTransaction::KEY_ERROR => null,
-            HttpTransaction::KEY_OPTIONS => [
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_ERROR => null,
+            HttpTransactionInterface::KEY_OPTIONS => [
                 'value_1_options_key' => 'value_1_options_value',
             ]
         ];
@@ -231,13 +232,13 @@ class ContainerTest extends TestCase
         $httpTransaction1Response = \Mockery::mock(ResponseInterface::class);
 
         $httpTransaction0Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction0Response,
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => $httpTransaction0Response,
         ];
 
         $httpTransaction1Data = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => $httpTransaction1Response,
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => $httpTransaction1Response,
         ];
 
         $httpTransactions = [
@@ -263,8 +264,8 @@ class ContainerTest extends TestCase
     public function testClear(): void
     {
         $httpTransaction = [
-            HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
-            HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
+            HttpTransactionInterface::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
+            HttpTransactionInterface::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
         ];
 
         $container = new Container();

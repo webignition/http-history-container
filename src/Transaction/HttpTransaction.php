@@ -8,13 +8,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 
-class HttpTransaction
+class HttpTransaction implements HttpTransactionInterface
 {
-    public const KEY_REQUEST = 'request';
-    public const KEY_RESPONSE = 'response';
-    public const KEY_ERROR = 'error';
-    public const KEY_OPTIONS = 'options';
-
     private RequestInterface $request;
     private ?ResponseInterface $response;
 
@@ -55,10 +50,10 @@ class HttpTransaction
      */
     public static function fromArray(array $data): HttpTransaction
     {
-        $request = $data[self::KEY_REQUEST] ?? null;
-        $response = $data[self::KEY_RESPONSE] ?? null;
-        $error = $data[self::KEY_ERROR] ?? null;
-        $options = $data[self::KEY_OPTIONS] ?? [];
+        $request = $data[HttpTransactionInterface::KEY_REQUEST] ?? null;
+        $response = $data[HttpTransactionInterface::KEY_RESPONSE] ?? null;
+        $error = $data[HttpTransactionInterface::KEY_ERROR] ?? null;
+        $options = $data[HttpTransactionInterface::KEY_OPTIONS] ?? [];
 
         if (!$request instanceof RequestInterface) {
             throw InvalidTransactionException::createForInvalidRequest($data);
