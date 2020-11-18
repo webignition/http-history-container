@@ -61,4 +61,16 @@ class PeriodCollectionTest extends TestCase
             ],
         ];
     }
+
+    public function testAppend()
+    {
+        $collection = new PeriodCollection();
+        self::assertSame([], $collection->getPeriodsInMicroseconds());
+
+        $collection->append(1);
+        $collection->append(2);
+        $collection->append(15);
+
+        self::assertSame([1, 2, 15], $collection->getPeriodsInMicroseconds());
+    }
 }

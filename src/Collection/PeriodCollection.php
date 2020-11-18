@@ -33,6 +33,14 @@ class PeriodCollection implements \Countable, \IteratorAggregate
         $this->lastTimestampInMicroseconds = $current;
     }
 
+    public function append(int $period): void
+    {
+        $current = microtime(true);
+
+        $this->periodsInMicroseconds[] = $period;
+        $this->lastTimestampInMicroseconds = $current;
+    }
+
     /**
      * @return int[]
      */
