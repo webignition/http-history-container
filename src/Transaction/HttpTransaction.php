@@ -8,7 +8,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\InvalidTransactionException;
 
-class HttpTransaction
+class HttpTransaction implements HttpTransactionInterface
 {
     public const KEY_REQUEST = 'request';
     public const KEY_RESPONSE = 'response';

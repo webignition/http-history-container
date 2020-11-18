@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Collection;
 
-use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 /**
- * @implements \IteratorAggregate<int, HttpTransaction>
+ * @implements \IteratorAggregate<int, HttpTransactionInterface>
  */
 class HttpTransactionCollection implements \Countable, \IteratorAggregate
 {
     /**
-     * @var HttpTransaction[]
+     * @var HttpTransactionInterface[]
      */
     private array $transactions = [];
 
@@ -28,19 +28,19 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
         return $this->periods;
     }
 
-    public function add(HttpTransaction $transaction): void
+    public function add(HttpTransactionInterface $transaction): void
     {
         $this->transactions[] = $transaction;
         $this->periods->add();
     }
 
-    public function get(int $offset): ?HttpTransaction
+    public function get(int $offset): ?HttpTransactionInterface
     {
         return $this->transactions[$offset] ?? null;
     }
 
     /**
-     * @return HttpTransaction[]
+     * @return HttpTransactionInterface[]
      */
     public function getTransactions(): array
     {
@@ -53,7 +53,7 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \Iterator<HttpTransaction>
+     * @return \Iterator<HttpTransactionInterface>
      */
     public function getIterator(): \Iterator
     {
