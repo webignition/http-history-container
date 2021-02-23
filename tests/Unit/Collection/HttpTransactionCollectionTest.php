@@ -24,7 +24,7 @@ class HttpTransactionCollectionTest extends TestCase
         $this->collection = new HttpTransactionCollection();
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         self::assertCount(0, $this->collection);
 
@@ -41,7 +41,7 @@ class HttpTransactionCollectionTest extends TestCase
         self::assertSame($transactions, $this->collection->getTransactions());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         self::assertCount(0, $this->collection);
 
@@ -63,7 +63,7 @@ class HttpTransactionCollectionTest extends TestCase
         }
     }
 
-    public function testIterator()
+    public function testIterator(): void
     {
         $transactions = [
             \Mockery::mock(HttpTransactionInterface::class),
@@ -80,7 +80,7 @@ class HttpTransactionCollectionTest extends TestCase
         }
     }
 
-    public function testGetRequests()
+    public function testGetRequests(): void
     {
         $requests = [
             \Mockery::mock(RequestInterface::class),
@@ -106,7 +106,7 @@ class HttpTransactionCollectionTest extends TestCase
         }
     }
 
-    public function testGetResponses()
+    public function testGetResponses(): void
     {
         $responses = [
             \Mockery::mock(ResponseInterface::class),
@@ -132,7 +132,7 @@ class HttpTransactionCollectionTest extends TestCase
         }
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         self::assertCount(0, $this->collection);
 
@@ -156,9 +156,8 @@ class HttpTransactionCollectionTest extends TestCase
      * @dataProvider getPeriodsDataProvider
      *
      * @param HttpTransactionInterface[] $transactions
-     * @param callable $assertions
      */
-    public function testGetPeriods(array $transactions, callable $assertions)
+    public function testGetPeriods(array $transactions, callable $assertions): void
     {
         foreach ($transactions as $transaction) {
             $this->collection->add($transaction);
@@ -167,6 +166,9 @@ class HttpTransactionCollectionTest extends TestCase
         $assertions($this->collection->getPeriods());
     }
 
+    /**
+     * @return array[]
+     */
     public function getPeriodsDataProvider(): array
     {
         return [

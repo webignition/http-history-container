@@ -17,11 +17,14 @@ class RedirectLoopDetectorTest extends TestCase
     /**
      * @dataProvider hasRedirectLoopDataProvider
      */
-    public function testHasRedirectLoop(RedirectLoopDetector $redirectLoopDetector, bool $expectedHasRedirectLoop)
+    public function testHasRedirectLoop(RedirectLoopDetector $redirectLoopDetector, bool $expectedHasRedirectLoop): void
     {
         $this->assertEquals($expectedHasRedirectLoop, $redirectLoopDetector->hasRedirectLoop());
     }
 
+    /**
+     * @return array[]
+     */
     public function hasRedirectLoopDataProvider(): array
     {
         return [

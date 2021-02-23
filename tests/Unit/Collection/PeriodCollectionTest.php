@@ -16,7 +16,7 @@ class PeriodCollectionTest extends TestCase
      * @param int[] $addCallDelays
      * @param PeriodRange[] $expectedPeriodRanges
      */
-    public function testPopulate(array $addCallDelays, array $expectedPeriodRanges)
+    public function testPopulate(array $addCallDelays, array $expectedPeriodRanges): void
     {
         $collection = new PeriodCollection();
 
@@ -41,6 +41,9 @@ class PeriodCollectionTest extends TestCase
         }
     }
 
+    /**
+     * @return array[]
+     */
     public function populateDataProvider(): array
     {
         return [
@@ -62,7 +65,7 @@ class PeriodCollectionTest extends TestCase
         ];
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         $collection = new PeriodCollection();
         self::assertSame([], $collection->getPeriodsInMicroseconds());

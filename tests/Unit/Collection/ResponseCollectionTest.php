@@ -10,7 +10,7 @@ use webignition\HttpHistoryContainer\Collection\ResponseCollection;
 
 class ResponseCollectionTest extends TestCase
 {
-    public function testIterable()
+    public function testIterable(): void
     {
         $responses = [
             \Mockery::mock(ResponseInterface::class),
@@ -30,12 +30,15 @@ class ResponseCollectionTest extends TestCase
     /**
      * @dataProvider countableDataProvider
      */
-    public function testCountable(ResponseCollection $collection, int $expectedCount)
+    public function testCountable(ResponseCollection $collection, int $expectedCount): void
     {
         self::assertInstanceOf(\Countable::class, $collection);
         self::assertCount($expectedCount, $collection);
     }
 
+    /**
+     * @return array[]
+     */
     public function countableDataProvider(): array
     {
         return [
@@ -63,11 +66,14 @@ class ResponseCollectionTest extends TestCase
     /**
      * @dataProvider getLastDataProvider
      */
-    public function testGetLast(ResponseCollection $collection, ?ResponseInterface $expectedLast)
+    public function testGetLast(ResponseCollection $collection, ?ResponseInterface $expectedLast): void
     {
         self::assertSame($expectedLast, $collection->getLast());
     }
 
+    /**
+     * @return array[]
+     */
     public function getLastDataProvider(): array
     {
         $firstRequest = \Mockery::mock(ResponseInterface::class);

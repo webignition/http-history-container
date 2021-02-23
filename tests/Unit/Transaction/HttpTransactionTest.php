@@ -15,12 +15,10 @@ class HttpTransactionTest extends TestCase
     /**
      * @dataProvider createDataProvider
      *
-     * @param RequestInterface $request
-     * @param ResponseInterface|null $response
      * @param mixed $error
      * @param array<mixed> $options
      */
-    public function testCreate(RequestInterface $request, ?ResponseInterface $response, $error, array $options)
+    public function testCreate(RequestInterface $request, ?ResponseInterface $response, $error, array $options): void
     {
         $transaction = new HttpTransaction($request, $response, $error, $options);
 
@@ -30,6 +28,9 @@ class HttpTransactionTest extends TestCase
         self::assertSame($options, $transaction->getOptions());
     }
 
+    /**
+     * @return array[]
+     */
     public function createDataProvider(): array
     {
         return [
@@ -58,15 +59,19 @@ class HttpTransactionTest extends TestCase
      * @dataProvider createFromArrayThrowsExceptionDataProvider
      *
      * @param array<mixed> $data
-     * @param InvalidTransactionException $expectedException
      */
-    public function testCreateFromArrayThrowsException(array $data, InvalidTransactionException $expectedException)
-    {
+    public function testCreateFromArrayThrowsException(
+        array $data,
+        InvalidTransactionException $expectedException
+    ): void {
         self::expectExceptionObject($expectedException);
 
         HttpTransaction::fromArray($data);
     }
 
+    /**
+     * @return array[]
+     */
     public function createFromArrayThrowsExceptionDataProvider(): array
     {
         $validRequest = \Mockery::mock(RequestInterface::class);

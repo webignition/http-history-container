@@ -48,7 +48,7 @@ class LoggableContainerTest extends TestCase
      * @param array<mixed> $transactions
      * @param array<mixed> $expectedDecodedMessages
      */
-    public function testLogTransactions(array $transactions, array $expectedDecodedMessages)
+    public function testLogTransactions(array $transactions, array $expectedDecodedMessages): void
     {
         foreach ($transactions as $transaction) {
             $this->container[] = $transaction;
@@ -104,6 +104,9 @@ class LoggableContainerTest extends TestCase
         }
     }
 
+    /**
+     * @return array[]
+     */
     public function logTransactionsDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(

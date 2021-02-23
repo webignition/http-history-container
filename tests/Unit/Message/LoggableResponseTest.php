@@ -14,14 +14,16 @@ class LoggableResponseTest extends TestCase
     /**
      * @dataProvider jsonSerializeDataProvider
      *
-     * @param LoggableResponse $response
      * @param array<mixed> $expectedSerializedData
      */
-    public function testJsonSerialize(LoggableResponse $response, array $expectedSerializedData)
+    public function testJsonSerialize(LoggableResponse $response, array $expectedSerializedData): void
     {
         self::assertSame($expectedSerializedData, $response->jsonSerialize());
     }
 
+    /**
+     * @return array[]
+     */
     public function jsonSerializeDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(
@@ -77,9 +79,8 @@ class LoggableResponseTest extends TestCase
      * @dataProvider createFromJsonDataProvider
      *
      * @param string $serializedResponse
-     * @param LoggableResponse $expectedLoggableResponse
      */
-    public function testCreateFromJson(string $serializedResponse, LoggableResponse $expectedLoggableResponse)
+    public function testCreateFromJson(string $serializedResponse, LoggableResponse $expectedLoggableResponse): void
     {
         $loggableResponse = LoggableResponse::fromJson($serializedResponse);
         $response = $loggableResponse->getResponse();
@@ -93,6 +94,9 @@ class LoggableResponseTest extends TestCase
         self::assertSame($expectedResponse->getBody()->getContents(), $response->getBody()->getContents());
     }
 
+    /**
+     * @return array[]
+     */
     public function createFromJsonDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(
