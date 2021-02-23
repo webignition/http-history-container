@@ -12,7 +12,7 @@ use webignition\HttpHistoryContainer\Collection\UrlCollection;
 
 class RequestCollectionTest extends TestCase
 {
-    public function testIterable()
+    public function testIterable(): void
     {
         $requests = [
             \Mockery::mock(RequestInterface::class),
@@ -32,12 +32,15 @@ class RequestCollectionTest extends TestCase
     /**
      * @dataProvider countableDataProvider
      */
-    public function testCountable(RequestCollection $collection, int $expectedCount)
+    public function testCountable(RequestCollection $collection, int $expectedCount): void
     {
         self::assertInstanceOf(\Countable::class, $collection);
         self::assertCount($expectedCount, $collection);
     }
 
+    /**
+     * @return array[]
+     */
     public function countableDataProvider(): array
     {
         return [
@@ -65,11 +68,14 @@ class RequestCollectionTest extends TestCase
     /**
      * @dataProvider getLastDataProvider
      */
-    public function testGetLast(RequestCollection $collection, ?RequestInterface $expectedLast)
+    public function testGetLast(RequestCollection $collection, ?RequestInterface $expectedLast): void
     {
         self::assertSame($expectedLast, $collection->getLast());
     }
 
+    /**
+     * @return array[]
+     */
     public function getLastDataProvider(): array
     {
         $firstRequest = \Mockery::mock(RequestInterface::class);
@@ -100,11 +106,14 @@ class RequestCollectionTest extends TestCase
     /**
      * @dataProvider getUrlsDataProvider
      */
-    public function testGetUrls(RequestCollection $collection, UrlCollection $expectedUrls)
+    public function testGetUrls(RequestCollection $collection, UrlCollection $expectedUrls): void
     {
         self::assertEquals($expectedUrls, $collection->getUrls());
     }
 
+    /**
+     * @return array[]
+     */
     public function getUrlsDataProvider(): array
     {
         $firstUri = \Mockery::mock(UriInterface::class);

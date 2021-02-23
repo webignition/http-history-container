@@ -17,14 +17,16 @@ class LoggableTransactionTest extends TestCase
     /**
      * @dataProvider jsonSerializeDataProvider
      *
-     * @param LoggableTransaction $transaction
      * @param array<mixed> $expectedSerializedData
      */
-    public function testJsonSerialize(LoggableTransaction $transaction, array $expectedSerializedData)
+    public function testJsonSerialize(LoggableTransaction $transaction, array $expectedSerializedData): void
     {
         self::assertEquals($expectedSerializedData, $transaction->jsonSerialize());
     }
 
+    /**
+     * @return array[]
+     */
     public function jsonSerializeDataProvider(): array
     {
         $request = new Request('GET', 'http://example.com/request_one');
@@ -53,13 +55,16 @@ class LoggableTransactionTest extends TestCase
     /**
      * @dataProvider fromJsonDataProvider
      */
-    public function testFromJson(string $serializedTransaction, LoggableTransaction $expectedLoggableTransaction)
+    public function testFromJson(string $serializedTransaction, LoggableTransaction $expectedLoggableTransaction): void
     {
         $loggableTransaction = LoggableTransaction::fromJson($serializedTransaction);
 
         self::assertEquals($expectedLoggableTransaction, $loggableTransaction);
     }
 
+    /**
+     * @return array[]
+     */
     public function fromJsonDataProvider(): array
     {
         $request = new Request('GET', 'http://example.com/request_one');

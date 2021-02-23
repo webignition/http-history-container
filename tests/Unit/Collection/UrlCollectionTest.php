@@ -10,7 +10,7 @@ use webignition\HttpHistoryContainer\Collection\UrlCollection;
 
 class UrlCollectionTest extends TestCase
 {
-    public function testIterable()
+    public function testIterable(): void
     {
         $urls = [
             \Mockery::mock(UriInterface::class),
@@ -30,12 +30,15 @@ class UrlCollectionTest extends TestCase
     /**
      * @dataProvider countableDataProvider
      */
-    public function testCountable(UrlCollection $collection, int $expectedCount)
+    public function testCountable(UrlCollection $collection, int $expectedCount): void
     {
         self::assertInstanceOf(\Countable::class, $collection);
         self::assertCount($expectedCount, $collection);
     }
 
+    /**
+     * @return array[]
+     */
     public function countableDataProvider(): array
     {
         return [
@@ -63,11 +66,14 @@ class UrlCollectionTest extends TestCase
     /**
      * @dataProvider getLastDataProvider
      */
-    public function testGetLast(UrlCollection $collection, ?UriInterface $expectedLast)
+    public function testGetLast(UrlCollection $collection, ?UriInterface $expectedLast): void
     {
         self::assertSame($expectedLast, $collection->getLast());
     }
 
+    /**
+     * @return array[]
+     */
     public function getLastDataProvider(): array
     {
         $firstUrl = \Mockery::mock(UriInterface::class);

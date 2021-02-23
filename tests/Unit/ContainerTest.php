@@ -31,6 +31,9 @@ class ContainerTest extends TestCase
         $container->offsetSet($offset, null);
     }
 
+    /**
+     * @return array[]
+     */
     public function invalidOffsetDataProvider(): array
     {
         return [
@@ -64,7 +67,7 @@ class ContainerTest extends TestCase
         Container $container,
         array $transactionData,
         HttpTransactionCollection $expectedTransactions
-    ) {
+    ): void {
         $container->offsetSet(null, $transactionData);
         $transactions = $container->getTransactions();
 
@@ -74,6 +77,9 @@ class ContainerTest extends TestCase
         self::assertEquals($expectedTransactions, $transactions);
     }
 
+    /**
+     * @return array[]
+     */
     public function offsetDataProvider(): array
     {
         $httpTransaction0Data = [
@@ -115,7 +121,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    public function testOffsetGetOffsetNull()
+    public function testOffsetGetOffsetNull(): void
     {
         $container = $this->createContainer([
             [
@@ -135,10 +141,13 @@ class ContainerTest extends TestCase
         Container $container,
         int $offset,
         ?HttpTransaction $expectedHttpTransaction
-    ) {
+    ): void {
         self::assertEquals($expectedHttpTransaction, $container->offsetGet($offset));
     }
 
+    /**
+     * @return array[]
+     */
     public function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {
         $httpTransaction0Data = [
@@ -189,7 +198,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    public function testOffsetExists()
+    public function testOffsetExists(): void
     {
         $httpTransaction0Data = [
             HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
