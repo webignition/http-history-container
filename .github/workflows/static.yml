@@ -24,10 +24,11 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
 
-      - name: PHPStan
-        uses: docker://oskarstark/phpstan-ga
-        env:
-          REQUIRE_DEV: true
-          CHECK_PLATFORM_REQUIREMENTS: false
+      - name: Download dependencies
+        uses: php-actions/composer@v2
         with:
-          args: analyse --no-progress
+          args: --ignore-platform-reqs --quiet
+
+      - name: PHPStan
+        run: composer static-analysis
+
