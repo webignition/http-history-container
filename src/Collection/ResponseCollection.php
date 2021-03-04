@@ -6,10 +6,7 @@ namespace webignition\HttpHistoryContainer\Collection;
 
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * @implements \IteratorAggregate<int, ResponseInterface>
- */
-class ResponseCollection implements \Countable, \IteratorAggregate
+class ResponseCollection implements ResponseCollectionInterface
 {
     /**
      * @var ResponseInterface[]

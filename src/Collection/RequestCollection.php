@@ -6,10 +6,7 @@ namespace webignition\HttpHistoryContainer\Collection;
 
 use Psr\Http\Message\RequestInterface;
 
-/**
- * @implements \IteratorAggregate<int, RequestInterface>
- */
-class RequestCollection implements \Countable, \IteratorAggregate
+class RequestCollection implements RequestCollectionInterface
 {
     /**
      * @var RequestInterface[]
@@ -48,7 +45,7 @@ class RequestCollection implements \Countable, \IteratorAggregate
         return array_pop($requests);
     }
 
-    public function getUrls(): UrlCollection
+    public function getUrls(): UrlCollectionInterface
     {
         $urls = [];
 
