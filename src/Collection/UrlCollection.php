@@ -6,10 +6,7 @@ namespace webignition\HttpHistoryContainer\Collection;
 
 use Psr\Http\Message\UriInterface;
 
-/**
- * @implements \IteratorAggregate<int, UriInterface>
- */
-class UrlCollection implements \Countable, \IteratorAggregate
+class UrlCollection implements UrlCollectionInterface
 {
     /**
      * @var UriInterface[]
