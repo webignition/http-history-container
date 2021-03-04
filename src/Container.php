@@ -30,12 +30,11 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * @param mixed $offset
-     * @param mixed $httpTransactionData
+     * @param null|mixed $offset
      *
      * @throws InvalidTransactionException
      */
-    public function offsetSet($offset, $httpTransactionData): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (null !== $offset) {
             throw new \InvalidArgumentException(
@@ -44,17 +43,15 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
             );
         }
 
-        $httpTransaction = HttpTransaction::fromArray($httpTransactionData);
+        $httpTransaction = HttpTransaction::fromArray($value);
 
         $this->transactions->add($httpTransaction);
     }
 
     /**
-     * @param mixed $offset
-     *
-     * @return bool
+     * @param int|mixed $offset
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         if (false === is_int($offset)) {
             return false;
@@ -63,19 +60,14 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->offsetGet($offset) instanceof HttpTransactionInterface;
     }
 
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
     }
 
     /**
-     * @param mixed $offset
-     *
-     * @return HttpTransactionInterface|null
+     * @param ?mixed $offset
      */
-    public function offsetGet($offset): ?HttpTransactionInterface
+    public function offsetGet(mixed $offset): ?HttpTransactionInterface
     {
         return null === $offset
             ? null

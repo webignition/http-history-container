@@ -275,8 +275,6 @@ class RedirectLoopDetectorTest extends TestCase
 
     /**
      * @param array<mixed> $transactions
-     *
-     * @return HttpTransactionCollection
      */
     private function createCollection(array $transactions): HttpTransactionCollection
     {

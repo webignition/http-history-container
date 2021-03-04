@@ -9,11 +9,8 @@ use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 
 class RedirectLoopDetector
 {
-    private HttpTransactionCollection $transactions;
-
-    public function __construct(HttpTransactionCollection $transactions)
+    public function __construct(private HttpTransactionCollection $transactions)
     {
-        $this->transactions = $transactions;
     }
 
     public function hasRedirectLoop(): bool
@@ -35,8 +32,6 @@ class RedirectLoopDetector
 
     /**
      * @param string[] $urls
-     *
-     * @return bool
      */
     private function doesUrlSetHaveRedirectLoop(array $urls): bool
     {

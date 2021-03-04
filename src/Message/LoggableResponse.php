@@ -16,11 +16,8 @@ class LoggableResponse extends AbstractLoggableMessage
     private const DEFAULT_EMPTY_HEADERS = [];
     private const DEFAULT_EMPTY_BODY = '';
 
-    private ?ResponseInterface $response;
-
-    public function __construct(?ResponseInterface $request)
+    public function __construct(private ?ResponseInterface $response)
     {
-        $this->response = $request;
     }
 
     public static function fromJson(string $request): self

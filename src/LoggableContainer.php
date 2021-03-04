@@ -10,18 +10,17 @@ use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 class LoggableContainer extends Container
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
         parent::__construct();
-
-        $this->logger = $logger;
     }
 
-    public function offsetSet($offset, $httpTransactionData): void
+    /**
+     * @throws InvalidTransactionException
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        parent::offsetSet($offset, $httpTransactionData);
+        parent::offsetSet($offset, $value);
 
         $collection = $this->getTransactions();
         $transactions = $collection->getTransactions();

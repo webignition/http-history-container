@@ -18,11 +18,8 @@ class LoggableRequest extends AbstractLoggableMessage
     private const DEFAULT_EMPTY_HEADERS = [];
     private const DEFAULT_EMPTY_BODY = '';
 
-    private RequestInterface $request;
-
-    public function __construct(RequestInterface $request)
+    public function __construct(private RequestInterface $request)
     {
-        $this->request = $request;
     }
 
     public static function fromJson(string $request): self
