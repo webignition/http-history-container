@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
+use webignition\HttpHistoryContainer\Collection\HttpTransactionCollectionInterface;
 use webignition\HttpHistoryContainer\Collection\PeriodCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
@@ -201,6 +202,116 @@ class HttpTransactionCollectionTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider sliceDataProvider
+     */
+    public function testSlice(
+        HttpTransactionCollectionInterface $collection,
+        int $offset,
+        ?int $length,
+        HttpTransactionCollectionInterface $expectedCollection
+    ): void {
+        $mutatedCollection = $collection->slice($offset, $length);
+
+        self::assertEquals($expectedCollection->getTransactions(), $mutatedCollection->getTransactions());
+    }
+
+    /**
+     * @return array[]
+     */
+    public function sliceDataProvider(): array
+    {
+        $transaction1 = new HttpTransaction(
+            \Mockery::mock(RequestInterface::class),
+            null,
+            null,
+            [
+                'item-one-option-key' => 'item-one-option-value',
+            ]
+        );
+
+        $transaction2 = new HttpTransaction(
+            \Mockery::mock(RequestInterface::class),
+            null,
+            null,
+            [
+                'item-two-option-key' => 'item-two-option-value',
+            ]
+        );
+
+        $transaction3 = new HttpTransaction(
+            \Mockery::mock(RequestInterface::class),
+            null,
+            null,
+            [
+                'item-three-option-key' => 'item-three-option-value',
+            ]
+        );
+
+        return [
+            'empty' => [
+                'collection' => new HttpTransactionCollection(),
+                'offset' => 0,
+                'length' => null,
+                'expectedCollection' => new HttpTransactionCollection(),
+            ],
+            'offset: 0, length: null, single item collection' => [
+                'collection' => $this->createCollection([$transaction1]),
+                'offset' => 0,
+                'length' => null,
+                'expectedCollection' => $this->createCollection([$transaction1]),
+            ],
+            'offset: 0, length: null, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => 0,
+                'length' => null,
+                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+            ],
+            'offset: 0, length: 1, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => 0,
+                'length' => 1,
+                'expectedCollection' => $this->createCollection([$transaction1]),
+            ],
+            'offset: 0, length: 2, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => 0,
+                'length' => 2,
+                'expectedCollection' => $this->createCollection([$transaction1, $transaction2]),
+            ],
+            'offset: 0, length: 3, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => 0,
+                'length' => 3,
+                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+            ],
+            'offset: 0, length: 4, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => 0,
+                'length' => 4,
+                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+            ],
+            'offset: -1, length: null, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => -1,
+                'length' => null,
+                'expectedCollection' => $this->createCollection([$transaction3]),
+            ],
+            'offset: -2, length: null, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => -2,
+                'length' => null,
+                'expectedCollection' => $this->createCollection([$transaction2, $transaction3]),
+            ],
+            'offset: -3, length: null, triple item collection' => [
+                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'offset' => -3,
+                'length' => null,
+                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+            ],
+        ];
+    }
+
     private function createLoggableTransactionWithPeriod(int $period): LoggableTransaction
     {
         $transaction = \Mockery::mock(LoggableTransaction::class);
@@ -209,5 +320,19 @@ class HttpTransactionCollectionTest extends TestCase
             ->andReturn($period);
 
         return $transaction;
+    }
+
+    /**
+     * @param HttpTransactionInterface[] $transactions
+     */
+    private function createCollection(array $transactions): HttpTransactionCollectionInterface
+    {
+        $collection = new HttpTransactionCollection();
+
+        foreach ($transactions as $transaction) {
+            $collection->add($transaction);
+        }
+
+        return $collection;
     }
 }
