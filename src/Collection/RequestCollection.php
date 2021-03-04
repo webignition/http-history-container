@@ -45,7 +45,7 @@ class RequestCollection implements RequestCollectionInterface
         return array_pop($requests);
     }
 
-    public function getUrls(): UrlCollection
+    public function getUrls(): UrlCollectionInterface
     {
         $urls = [];
 
