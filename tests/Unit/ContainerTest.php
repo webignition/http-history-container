@@ -59,9 +59,7 @@ class ContainerTest extends TestCase
     /**
      * @dataProvider offsetDataProvider
      *
-     * @param Container $container
      * @param array<mixed> $transactionData
-     * @param HttpTransactionCollection $expectedTransactions
      */
     public function testOffsetSet(
         Container $container,
@@ -287,8 +285,6 @@ class ContainerTest extends TestCase
 
     /**
      * @param HttpTransaction[] $transactions
-     *
-     * @return HttpTransactionCollection
      */
     private function createHttpTransactionCollection(array $transactions): HttpTransactionCollection
     {
@@ -303,8 +299,6 @@ class ContainerTest extends TestCase
 
     /**
      * @param array<mixed> $transactionDataSets
-     *
-     * @return Container
      */
     private function createContainer(array $transactionDataSets): Container
     {

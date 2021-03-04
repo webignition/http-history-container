@@ -112,8 +112,6 @@ class LoggableRequestTest extends TestCase
 
     /**
      * @dataProvider createFromJsonDataProvider
-     *
-     * @param string $serializedRequest
      */
     public function testCreateFromJson(string $serializedRequest, LoggableRequest $expectedLoggableRequest): void
     {

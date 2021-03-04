@@ -17,20 +17,11 @@ class InvalidTransactionException extends \Exception
     public const VALUE_RESPONSE_NOT_RESPONSE_CODE = 2;
 
     /**
-     * @var array<mixed>
-     */
-    private array $data;
-
-    /**
-     * @param string $message
-     * @param int $code
      * @param array<mixed> $data
      */
-    public function __construct(string $message, int $code, array $data)
+    public function __construct(string $message, int $code, private array $data)
     {
         parent::__construct($message, $code);
-
-        $this->data = $data;
     }
 
     /**
@@ -43,8 +34,6 @@ class InvalidTransactionException extends \Exception
 
     /**
      * @param array<mixed> $data
-     *
-     * @return self
      */
     public static function createForInvalidRequest(array $data): self
     {
@@ -57,8 +46,6 @@ class InvalidTransactionException extends \Exception
 
     /**
      * @param array<mixed> $data
-     *
-     * @return self
      */
     public static function createForInvalidResponse(array $data): self
     {

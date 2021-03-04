@@ -18,13 +18,8 @@ class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
     private const DEFAULT_EMPTY_REQUEST_DATA = [];
     private const DEFAULT_EMPTY_RESPONSE_DATA = [];
 
-    private HttpTransaction $transaction;
-    private int $period;
-
-    public function __construct(HttpTransaction $transaction, int $period)
+    public function __construct(private HttpTransaction $transaction, private int $period)
     {
-        $this->transaction = $transaction;
-        $this->period = $period;
     }
 
     public static function fromJson(string $transaction): self

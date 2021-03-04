@@ -15,46 +15,26 @@ class HttpTransaction implements HttpTransactionInterface
     public const KEY_ERROR = 'error';
     public const KEY_OPTIONS = 'options';
 
-    private RequestInterface $request;
-    private ?ResponseInterface $response;
-
     /**
-     * @var mixed
-     */
-    private $error;
-
-    /**
-     * @var array<mixed>
-     */
-    private array $options;
-
-    /**
-     * @param RequestInterface $request
-     * @param ResponseInterface|null $response
-     * @param mixed $error
      * @param array<mixed> $options
      */
     public function __construct(
-        RequestInterface $request,
-        ?ResponseInterface $response,
-        $error,
-        array $options
+        private RequestInterface $request,
+        private ?ResponseInterface $response,
+        private mixed $error,
+        private array $options
     ) {
-        $this->request = $request;
-        $this->response = $response;
-        $this->error = $error;
-        $this->options = $options;
     }
 
     /**
-     * @param array<mixed> $data
-     *
-     * @return HttpTransaction
-     *
      * @throws InvalidTransactionException
      */
-    public static function fromArray(array $data): HttpTransaction
+    public static function fromArray(mixed $data): HttpTransaction
     {
+        if (!is_array($data)) {
+            $data = [];
+        }
+
         $request = $data[self::KEY_REQUEST] ?? null;
         $response = $data[self::KEY_RESPONSE] ?? null;
         $error = $data[self::KEY_ERROR] ?? null;
