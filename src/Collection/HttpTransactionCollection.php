@@ -87,4 +87,16 @@ class HttpTransactionCollection implements HttpTransactionCollectionInterface
     {
         $this->transactions = [];
     }
+
+    public function slice(int $offset, ?int $length): HttpTransactionCollectionInterface
+    {
+        $slicedTransactions = array_slice($this->transactions, $offset, $length);
+
+        $collection = new HttpTransactionCollection();
+        foreach ($slicedTransactions as $transaction) {
+            $collection->add($transaction);
+        }
+
+        return $collection;
+    }
 }

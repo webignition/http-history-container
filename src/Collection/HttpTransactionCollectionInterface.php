@@ -29,4 +29,6 @@ interface HttpTransactionCollectionInterface extends \Countable, \IteratorAggreg
     public function getResponses(): ResponseCollectionInterface;
 
     public function clear(): void;
+
+    public function slice(int $offset, ?int $length): HttpTransactionCollectionInterface;
 }
