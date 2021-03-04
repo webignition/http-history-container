@@ -7,24 +7,21 @@ namespace webignition\HttpHistoryContainer\Collection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 use webignition\HttpHistoryContainer\Transaction\WithPeriodInterface;
 
-/**
- * @implements \IteratorAggregate<int, HttpTransactionInterface>
- */
-class HttpTransactionCollection implements \Countable, \IteratorAggregate
+class HttpTransactionCollection implements HttpTransactionCollectionInterface
 {
     /**
      * @var HttpTransactionInterface[]
      */
     private array $transactions = [];
 
-    private PeriodCollection $periods;
+    private PeriodCollectionInterface $periods;
 
     public function __construct()
     {
         $this->periods = new PeriodCollection();
     }
 
-    public function getPeriods(): PeriodCollection
+    public function getPeriods(): PeriodCollectionInterface
     {
         return $this->periods;
     }
@@ -66,7 +63,7 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
         return new \ArrayIterator($this->transactions);
     }
 
-    public function getRequests(): RequestCollection
+    public function getRequests(): RequestCollectionInterface
     {
         $requests = [];
         foreach ($this->transactions as $transaction) {
@@ -76,7 +73,7 @@ class HttpTransactionCollection implements \Countable, \IteratorAggregate
         return new RequestCollection($requests);
     }
 
-    public function getResponses(): ResponseCollection
+    public function getResponses(): ResponseCollectionInterface
     {
         $responses = [];
         foreach ($this->transactions as $transaction) {
