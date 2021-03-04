@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Collection;
 
-/**
- * @implements \IteratorAggregate<int, int>
- */
-class PeriodCollection implements \Countable, \IteratorAggregate
+class PeriodCollection implements PeriodCollectionInterface
 {
     private const MICROSECONDS_PER_SECOND = 1000000;
 
