@@ -8,7 +8,7 @@ on:
 
 jobs:
   ecs:
-    name: Easy Coding Standard - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
+    name: PHP CS Fixer Dry Run - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
@@ -29,8 +29,8 @@ jobs:
         with:
           args: --ignore-platform-reqs --quiet
 
-      - name: Run ECS
-        run: composer cs-ecs
+      - name: Run
+        run: composer cs-fixer-dry-run
 
   phpcs:
     name: PHPCS - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
@@ -54,5 +54,5 @@ jobs:
         with:
           args: --ignore-platform-reqs --quiet
 
-      - name: Run PHPCS
+      - name: Run
         run: composer cs-phpcs
