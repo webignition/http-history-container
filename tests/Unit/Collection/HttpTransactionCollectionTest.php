@@ -317,7 +317,8 @@ class HttpTransactionCollectionTest extends TestCase
         $transaction = \Mockery::mock(LoggableTransaction::class);
         $transaction
             ->shouldReceive('getPeriod')
-            ->andReturn($period);
+            ->andReturn($period)
+        ;
 
         return $transaction;
     }

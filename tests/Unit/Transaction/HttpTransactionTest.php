@@ -15,7 +15,7 @@ class HttpTransactionTest extends TestCase
     /**
      * @dataProvider createDataProvider
      *
-     * @param mixed $error
+     * @param mixed        $error
      * @param array<mixed> $options
      */
     public function testCreate(RequestInterface $request, ?ResponseInterface $response, $error, array $options): void

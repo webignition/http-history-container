@@ -61,11 +61,6 @@ class LoggableRequest extends AbstractLoggableMessage
         return $this->request;
     }
 
-    protected function getMessage(): MessageInterface
-    {
-        return $this->request;
-    }
-
     /**
      * @return array<mixed>
      */
@@ -78,5 +73,10 @@ class LoggableRequest extends AbstractLoggableMessage
             ],
             parent::jsonSerialize()
         );
+    }
+
+    protected function getMessage(): MessageInterface
+    {
+        return $this->request;
     }
 }

@@ -105,7 +105,7 @@ class RedirectLoopDetectorTest extends TestCase
                         []
                     ),
                 ])),
-                 'expectedHasRedirectLoop' => false,
+                'expectedHasRedirectLoop' => false,
             ],
             'redirecting directly back to self' => [
                 'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
@@ -292,7 +292,8 @@ class RedirectLoopDetectorTest extends TestCase
         $response = \Mockery::mock(ResponseInterface::class);
         $response
             ->shouldReceive('getStatusCode')
-            ->andReturn($statusCode);
+            ->andReturn($statusCode)
+        ;
 
         return $response;
     }
@@ -302,17 +303,20 @@ class RedirectLoopDetectorTest extends TestCase
         $uri = \Mockery::mock(UriInterface::class);
         $uri
             ->shouldReceive('__toString')
-            ->andReturn($url);
+            ->andReturn($url)
+        ;
 
         $request = \Mockery::mock(RequestInterface::class);
 
         $request
             ->shouldReceive('getMethod')
-            ->andReturn($method);
+            ->andReturn($method)
+        ;
 
         $request
             ->shouldReceive('getUri')
-            ->andReturn($uri);
+            ->andReturn($uri)
+        ;
 
         return $request;
     }

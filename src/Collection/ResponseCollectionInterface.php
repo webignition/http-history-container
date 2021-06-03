@@ -15,5 +15,6 @@ interface ResponseCollectionInterface extends \Countable, \IteratorAggregate
      * @return \Iterator<int, ResponseInterface>
      */
     public function getIterator(): \Iterator;
+
     public function getLast(): ?ResponseInterface;
 }

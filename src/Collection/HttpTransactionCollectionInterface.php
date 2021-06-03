@@ -12,7 +12,9 @@ use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 interface HttpTransactionCollectionInterface extends \Countable, \IteratorAggregate
 {
     public function getPeriods(): PeriodCollectionInterface;
+
     public function add(HttpTransactionInterface $transaction): void;
+
     public function get(int $offset): ?HttpTransactionInterface;
 
     /**
@@ -26,6 +28,7 @@ interface HttpTransactionCollectionInterface extends \Countable, \IteratorAggreg
     public function getIterator(): \Iterator;
 
     public function getRequests(): RequestCollectionInterface;
+
     public function getResponses(): ResponseCollectionInterface;
 
     public function clear(): void;
