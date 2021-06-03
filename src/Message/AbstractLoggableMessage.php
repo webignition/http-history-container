@@ -11,8 +11,6 @@ abstract class AbstractLoggableMessage implements \JsonSerializable
     public const KEY_HEADERS = 'headers';
     public const KEY_BODY = 'body';
 
-    abstract protected function getMessage(): ?MessageInterface;
-
     /**
      * @return array<mixed>
      */
@@ -32,4 +30,6 @@ abstract class AbstractLoggableMessage implements \JsonSerializable
 
         return [];
     }
+
+    abstract protected function getMessage(): ?MessageInterface;
 }

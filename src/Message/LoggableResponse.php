@@ -53,11 +53,6 @@ class LoggableResponse extends AbstractLoggableMessage
         return $this->response;
     }
 
-    protected function getMessage(): ?MessageInterface
-    {
-        return $this->response;
-    }
-
     /**
      * @return array<mixed>
      */
@@ -73,5 +68,10 @@ class LoggableResponse extends AbstractLoggableMessage
         }
 
         return [];
+    }
+
+    protected function getMessage(): ?MessageInterface
+    {
+        return $this->response;
     }
 }

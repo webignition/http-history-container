@@ -120,19 +120,22 @@ class RequestCollectionTest extends TestCase
         $firstRequest = \Mockery::mock(RequestInterface::class);
         $firstRequest
             ->shouldReceive('getUri')
-            ->andReturn($firstUri);
+            ->andReturn($firstUri)
+        ;
 
         $secondUri = \Mockery::mock(UriInterface::class);
         $secondRequest = \Mockery::mock(RequestInterface::class);
         $secondRequest
             ->shouldReceive('getUri')
-            ->andReturn($secondUri);
+            ->andReturn($secondUri)
+        ;
 
         $thirdUri = \Mockery::mock(UriInterface::class);
         $thirdRequest = \Mockery::mock(RequestInterface::class);
         $thirdRequest
             ->shouldReceive('getUri')
-            ->andReturn($thirdUri);
+            ->andReturn($thirdUri)
+        ;
 
         return [
             'empty' => [

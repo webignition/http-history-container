@@ -260,7 +260,7 @@ class ContainerTest extends TestCase
         $iteratedTransactionCount = 0;
 
         foreach ($container as $httpTransactionIndex => $httpTransaction) {
-            $iteratedTransactionCount++;
+            ++$iteratedTransactionCount;
             self::assertEquals($httpTransactions[$httpTransactionIndex], $httpTransaction);
         }
 

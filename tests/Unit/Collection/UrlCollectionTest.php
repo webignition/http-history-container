@@ -114,7 +114,8 @@ class UrlCollectionTest extends TestCase
             $url = \Mockery::mock(UriInterface::class);
             $url
                 ->shouldReceive('__toString')
-                ->andReturn($urlString);
+                ->andReturn($urlString)
+            ;
 
             $urls[] = $url;
         }

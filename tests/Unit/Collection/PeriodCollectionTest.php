@@ -13,7 +13,7 @@ class PeriodCollectionTest extends TestCase
     /**
      * @dataProvider populateDataProvider
      *
-     * @param int[] $addCallDelays
+     * @param int[]         $addCallDelays
      * @param PeriodRange[] $expectedPeriodRanges
      */
     public function testPopulate(array $addCallDelays, array $expectedPeriodRanges): void

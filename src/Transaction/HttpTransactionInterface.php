@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 interface HttpTransactionInterface
 {
     public function getRequest(): RequestInterface;
+
     public function getResponse(): ?ResponseInterface;
 
     /**

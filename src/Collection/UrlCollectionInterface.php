@@ -15,6 +15,7 @@ interface UrlCollectionInterface extends \Countable, \IteratorAggregate
      * @return \Iterator<int, UriInterface>
      */
     public function getIterator(): \Iterator;
+
     public function getLast(): ?UriInterface;
 
     /**

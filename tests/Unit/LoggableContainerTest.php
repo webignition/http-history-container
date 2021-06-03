@@ -35,7 +35,8 @@ class LoggableContainerTest extends TestCase
         $logger = new Logger('');
         $logHandler = new StreamHandler($this->stream);
         $logHandler
-            ->setFormatter(new LineFormatter('%message%' . "\n"));
+            ->setFormatter(new LineFormatter('%message%' . "\n"))
+        ;
 
         $logger->pushHandler($logHandler);
 

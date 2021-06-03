@@ -15,6 +15,8 @@ interface RequestCollectionInterface extends \Countable, \IteratorAggregate
      * @return \Iterator<int, RequestInterface>
      */
     public function getIterator(): \Iterator;
+
     public function getLast(): ?RequestInterface;
+
     public function getUrls(): UrlCollectionInterface;
 }

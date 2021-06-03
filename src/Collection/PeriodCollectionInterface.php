@@ -10,6 +10,7 @@ namespace webignition\HttpHistoryContainer\Collection;
 interface PeriodCollectionInterface extends \Countable, \IteratorAggregate
 {
     public function add(): void;
+
     public function append(int $period): void;
 
     /**
