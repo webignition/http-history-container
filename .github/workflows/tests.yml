@@ -28,13 +28,14 @@ jobs:
       - name: Download dependencies
         uses: php-actions/composer@v6
         with:
-          php_version: ${{ matrix.php-versions }}
+          php_version: ${{ matrix.php }}
           args: --ignore-platform-reqs --quiet
 
       - name: Download psr/log ${{ matrix.psr-log }}
         uses: php-actions/composer@v6
         with:
           command: require
+          php_version: ${{ matrix.php }}
           args: psr/log ${{ matrix.psr-log }} -W
 
       - name: Run PHPUnit unit tests
