@@ -13,7 +13,6 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest]
         php: ['8.0']
-        psr-log: ['^1.1', '^2.0', '^3.0']
 
     runs-on: ${{ matrix.operating-system }}
     steps:
@@ -30,13 +29,6 @@ jobs:
         with:
           php_version: ${{ matrix.php }}
           args: --ignore-platform-reqs --quiet
-
-      - name: Download psr/log ${{ matrix.psr-log }}
-        uses: php-actions/composer@v6
-        with:
-          command: require
-          php_version: ${{ matrix.php }}
-          args: psr/log ${{ matrix.psr-log }} -W
 
       - name: Run PHPUnit unit tests
         run: composer test
