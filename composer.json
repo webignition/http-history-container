@@ -22,8 +22,8 @@
         }
     },
     "scripts": {
-        "cs-fixer-dry-run": "./vendor/bin/php-cs-fixer fix --dry-run --verbose --show-progress none",
-        "cs-fixer-fix": "./vendor/bin/php-cs-fixer fix --diff",
+        "cs-fixer-dry-run": "docker run --rm -i -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --dry-run --verbose --show-progress none",
+        "cs-fixer-fix": "docker run --rm -i -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --diff",
         "cs-phpcs": "./vendor/bin/phpcs",
         "cs": [
             "@cs-fixer-dry-run",
@@ -45,7 +45,6 @@
         "psr/log": "^1.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
         "mockery/mockery": "^1.4",
         "monolog/monolog": "^2.2",
         "phpstan/extension-installer": "^1.1",
