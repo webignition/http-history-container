@@ -42,11 +42,11 @@
         "ext-json": "*",
         "guzzlehttp/psr7": "^1.7 || ^2.1",
         "psr/http-message": "^1.0",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1 || ^2.0 || ^3.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
-        "monolog/monolog": "^2.2",
+        "monolog/monolog": "^2",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^0.12.80",
         "phpstan/phpstan-mockery": "^0.12.12",
