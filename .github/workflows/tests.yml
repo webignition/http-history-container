@@ -35,7 +35,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           command: require
-          args: psr/log ${{ matrix.psr-log }}
+          args: psr/log ${{ matrix.psr-log }} -W
 
       - name: Run PHPUnit unit tests
         run: composer test
