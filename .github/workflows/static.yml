@@ -32,3 +32,13 @@ jobs:
       - name: PHPStan
         run: composer static-analysis
 
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run actionlint
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:latest -color
