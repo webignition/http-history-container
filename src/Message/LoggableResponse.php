@@ -23,6 +23,7 @@ class LoggableResponse extends AbstractLoggableMessage
     public static function fromJson(string $request): self
     {
         $data = json_decode($request, true);
+        $data = is_array($data) ? $data : [];
 
         $statusCode = $data[self::KEY_STATUS_CODE] ?? self::DEFAULT_EMPTY_STATUS_CODE;
         if (!is_int($statusCode)) {

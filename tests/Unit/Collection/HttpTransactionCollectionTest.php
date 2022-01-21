@@ -168,7 +168,7 @@ class HttpTransactionCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getPeriodsDataProvider(): array
     {
@@ -217,7 +217,7 @@ class HttpTransactionCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function sliceDataProvider(): array
     {

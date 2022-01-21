@@ -25,6 +25,7 @@ class LoggableRequest extends AbstractLoggableMessage
     public static function fromJson(string $request): self
     {
         $data = json_decode($request, true);
+        $data = is_array($data) ? $data : [];
 
         $method = $data[self::KEY_METHOD] ?? self::DEFAULT_EMPTY_METHOD;
         if (!is_string($method)) {

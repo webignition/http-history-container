@@ -42,7 +42,7 @@ class PeriodCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function populateDataProvider(): array
     {

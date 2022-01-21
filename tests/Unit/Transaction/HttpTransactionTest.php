@@ -29,7 +29,7 @@ class HttpTransactionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function createDataProvider(): array
     {
@@ -70,7 +70,7 @@ class HttpTransactionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function createFromArrayThrowsExceptionDataProvider(): array
     {

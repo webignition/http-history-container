@@ -52,7 +52,7 @@ class LoggableContainerTest extends TestCase
     public function testLogTransactions(array $transactions, array $expectedDecodedMessages): void
     {
         foreach ($transactions as $transaction) {
-            $this->container[] = $transaction;
+            $this->container->offsetSet(null, $transaction);
         }
 
         rewind($this->stream);
@@ -93,6 +93,9 @@ class LoggableContainerTest extends TestCase
             self::assertArrayHasKey(LoggableTransaction::KEY_RESPONSE, $expectedDecodedMessage);
 
             $decodedMessage = $decodedMessages[$messageIndex];
+            self::assertIsArray($decodedMessage);
+            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $decodedMessage);
+
             self::assertEquals(
                 $expectedDecodedMessage[LoggableTransaction::KEY_REQUEST],
                 $decodedMessage[LoggableTransaction::KEY_REQUEST]
@@ -106,7 +109,7 @@ class LoggableContainerTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function logTransactionsDataProvider(): array
     {

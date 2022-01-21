@@ -25,6 +25,7 @@ class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
     public static function fromJson(string $transaction): self
     {
         $data = json_decode($transaction, true);
+        $data = is_array($data) ? $data : [];
 
         $requestData = $data[self::KEY_REQUEST] ?? self::DEFAULT_EMPTY_REQUEST_DATA;
         if (!is_array($requestData)) {

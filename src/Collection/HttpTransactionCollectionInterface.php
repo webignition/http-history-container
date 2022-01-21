@@ -23,9 +23,9 @@ interface HttpTransactionCollectionInterface extends \Countable, \IteratorAggreg
     public function getTransactions(): array;
 
     /**
-     * @return \Iterator<HttpTransactionInterface>
+     * @return \Traversable<int, HttpTransactionInterface>
      */
-    public function getIterator(): \Iterator;
+    public function getIterator(): \Traversable;
 
     public function getRequests(): RequestCollectionInterface;
 
