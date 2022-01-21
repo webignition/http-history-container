@@ -8,7 +8,7 @@ on:
 
 jobs:
   unit:
-    name: PHPUnit unit tests - PHP ${{ matrix.php }} ${{ matrix.operating-system }}
+    name: PHPUnit unit tests - PHP ${{ matrix.php }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
@@ -28,7 +28,6 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php }}
-          args: --ignore-platform-reqs --quiet
 
       - name: Run PHPUnit unit tests
         run: composer test

@@ -39,7 +39,7 @@ class RequestCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function countableDataProvider(): array
     {
@@ -74,7 +74,7 @@ class RequestCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getLastDataProvider(): array
     {
@@ -112,7 +112,7 @@ class RequestCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getUrlsDataProvider(): array
     {

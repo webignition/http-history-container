@@ -69,15 +69,17 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetGet(mixed $offset): ?HttpTransactionInterface
     {
+        $offset = is_int($offset) ? $offset : null;
+
         return null === $offset
             ? null
             : $this->transactions->get($offset);
     }
 
     /**
-     * @return \Iterator<HttpTransactionInterface>
+     * @return \Traversable<int, HttpTransactionInterface>
      */
-    public function getIterator(): \Iterator
+    public function getIterator(): \Traversable
     {
         return $this->transactions->getIterator();
     }

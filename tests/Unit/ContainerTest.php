@@ -32,7 +32,7 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function invalidOffsetDataProvider(): array
     {
@@ -76,7 +76,7 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function offsetDataProvider(): array
     {
@@ -144,7 +144,7 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {

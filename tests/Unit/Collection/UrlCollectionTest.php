@@ -37,7 +37,7 @@ class UrlCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function countableDataProvider(): array
     {
@@ -72,7 +72,7 @@ class UrlCollectionTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function getLastDataProvider(): array
     {

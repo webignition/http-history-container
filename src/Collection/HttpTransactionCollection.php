@@ -55,10 +55,7 @@ class HttpTransactionCollection implements HttpTransactionCollectionInterface
         return count($this->transactions);
     }
 
-    /**
-     * @return \Iterator<HttpTransactionInterface>
-     */
-    public function getIterator(): \Iterator
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->transactions);
     }

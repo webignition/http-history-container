@@ -11,6 +11,7 @@ use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\RedirectLoopDetector;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
+use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 class RedirectLoopDetectorTest extends TestCase
 {
@@ -23,7 +24,7 @@ class RedirectLoopDetectorTest extends TestCase
     }
 
     /**
-     * @return array[]
+     * @return array<mixed>
      */
     public function hasRedirectLoopDataProvider(): array
     {
@@ -274,7 +275,7 @@ class RedirectLoopDetectorTest extends TestCase
     }
 
     /**
-     * @param array<mixed> $transactions
+     * @param HttpTransactionInterface[] $transactions
      */
     private function createCollection(array $transactions): HttpTransactionCollection
     {
