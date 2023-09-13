@@ -24,7 +24,7 @@ class LoggableResponseTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function jsonSerializeDataProvider(): array
+    public static function jsonSerializeDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(
             [
@@ -95,7 +95,7 @@ class LoggableResponseTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function createFromJsonDataProvider(): array
+    public static function createFromJsonDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(
             [

@@ -170,7 +170,7 @@ class HttpTransactionCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getPeriodsDataProvider(): array
+    public static function getPeriodsDataProvider(): array
     {
         return [
             'non-timed transactions' => [
@@ -191,9 +191,9 @@ class HttpTransactionCollectionTest extends TestCase
             ],
             'timed transactions' => [
                 'transactions' => [
-                    $this->createLoggableTransactionWithPeriod(0),
-                    $this->createLoggableTransactionWithPeriod(10),
-                    $this->createLoggableTransactionWithPeriod(200),
+                    self::createLoggableTransactionWithPeriod(0),
+                    self::createLoggableTransactionWithPeriod(10),
+                    self::createLoggableTransactionWithPeriod(200),
                 ],
                 'assertions' => function (PeriodCollection $periodCollection) {
                     self::assertSame([0, 10, 200], $periodCollection->getPeriodsInMicroseconds());
@@ -219,7 +219,7 @@ class HttpTransactionCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function sliceDataProvider(): array
+    public static function sliceDataProvider(): array
     {
         $transaction1 = new HttpTransaction(
             \Mockery::mock(RequestInterface::class),
@@ -256,63 +256,63 @@ class HttpTransactionCollectionTest extends TestCase
                 'expectedCollection' => new HttpTransactionCollection(),
             ],
             'offset: 0, length: null, single item collection' => [
-                'collection' => $this->createCollection([$transaction1]),
+                'collection' => self::createCollection([$transaction1]),
                 'offset' => 0,
                 'length' => null,
-                'expectedCollection' => $this->createCollection([$transaction1]),
+                'expectedCollection' => self::createCollection([$transaction1]),
             ],
             'offset: 0, length: null, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => 0,
                 'length' => null,
-                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'expectedCollection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
             ],
             'offset: 0, length: 1, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => 0,
                 'length' => 1,
-                'expectedCollection' => $this->createCollection([$transaction1]),
+                'expectedCollection' => self::createCollection([$transaction1]),
             ],
             'offset: 0, length: 2, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => 0,
                 'length' => 2,
-                'expectedCollection' => $this->createCollection([$transaction1, $transaction2]),
+                'expectedCollection' => self::createCollection([$transaction1, $transaction2]),
             ],
             'offset: 0, length: 3, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => 0,
                 'length' => 3,
-                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'expectedCollection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
             ],
             'offset: 0, length: 4, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => 0,
                 'length' => 4,
-                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'expectedCollection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
             ],
             'offset: -1, length: null, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => -1,
                 'length' => null,
-                'expectedCollection' => $this->createCollection([$transaction3]),
+                'expectedCollection' => self::createCollection([$transaction3]),
             ],
             'offset: -2, length: null, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => -2,
                 'length' => null,
-                'expectedCollection' => $this->createCollection([$transaction2, $transaction3]),
+                'expectedCollection' => self::createCollection([$transaction2, $transaction3]),
             ],
             'offset: -3, length: null, triple item collection' => [
-                'collection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'collection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
                 'offset' => -3,
                 'length' => null,
-                'expectedCollection' => $this->createCollection([$transaction1, $transaction2, $transaction3]),
+                'expectedCollection' => self::createCollection([$transaction1, $transaction2, $transaction3]),
             ],
         ];
     }
 
-    private function createLoggableTransactionWithPeriod(int $period): LoggableTransaction
+    private static function createLoggableTransactionWithPeriod(int $period): LoggableTransaction
     {
         $transaction = \Mockery::mock(LoggableTransaction::class);
         $transaction
@@ -326,7 +326,7 @@ class HttpTransactionCollectionTest extends TestCase
     /**
      * @param HttpTransactionInterface[] $transactions
      */
-    private function createCollection(array $transactions): HttpTransactionCollectionInterface
+    private static function createCollection(array $transactions): HttpTransactionCollectionInterface
     {
         $collection = new HttpTransactionCollection();
 

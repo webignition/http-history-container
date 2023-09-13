@@ -26,14 +26,14 @@ class RedirectLoopDetectorTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function hasRedirectLoopDataProvider(): array
+    public static function hasRedirectLoopDataProvider(): array
     {
         return [
             'single 200 response' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
                         \Mockery::mock(RequestInterface::class),
-                        $this->createResponse(200),
+                        self::createResponse(200),
                         null,
                         []
                     ),
@@ -41,16 +41,16 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => false,
             ],
             'contains non-redirect response (200)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
                         \Mockery::mock(RequestInterface::class),
-                        $this->createResponse(301),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
                         \Mockery::mock(RequestInterface::class),
-                        $this->createResponse(200),
+                        self::createResponse(200),
                         null,
                         []
                     ),
@@ -58,16 +58,16 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => false,
             ],
             'contains non-redirect response (404)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
                         \Mockery::mock(RequestInterface::class),
-                        $this->createResponse(301),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
                         \Mockery::mock(RequestInterface::class),
-                        $this->createResponse(404),
+                        self::createResponse(404),
                         null,
                         []
                     ),
@@ -75,16 +75,16 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => false,
             ],
             'only redirects, no loop (all different)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -92,16 +92,16 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => false,
             ],
             'method change within apparent loop is not loop' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -109,16 +109,16 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => false,
             ],
             'redirecting directly back to self' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -126,22 +126,22 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -149,40 +149,40 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self (with method group change)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -190,40 +190,40 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self(with method group change, loop in first group only)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/2'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/2'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -231,40 +231,40 @@ class RedirectLoopDetectorTest extends TestCase
                 'expectedHasRedirectLoop' => true,
             ],
             'redirecting indirectly back to self(with method group change, loop in second group only)' => [
-                'redirectLoopDetector' => new RedirectLoopDetector($this->createCollection([
+                'redirectLoopDetector' => new RedirectLoopDetector(self::createCollection([
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('HEAD', 'http://example.com/2'),
-                        $this->createResponse(301),
+                        self::createRequest('HEAD', 'http://example.com/2'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/1'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/1'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
                     new HttpTransaction(
-                        $this->createRequest('GET', 'http://example.com/'),
-                        $this->createResponse(301),
+                        self::createRequest('GET', 'http://example.com/'),
+                        self::createResponse(301),
                         null,
                         []
                     ),
@@ -277,7 +277,7 @@ class RedirectLoopDetectorTest extends TestCase
     /**
      * @param HttpTransactionInterface[] $transactions
      */
-    private function createCollection(array $transactions): HttpTransactionCollection
+    private static function createCollection(array $transactions): HttpTransactionCollection
     {
         $collection = new HttpTransactionCollection();
 
@@ -288,7 +288,7 @@ class RedirectLoopDetectorTest extends TestCase
         return $collection;
     }
 
-    private function createResponse(int $statusCode): ResponseInterface
+    private static function createResponse(int $statusCode): ResponseInterface
     {
         $response = \Mockery::mock(ResponseInterface::class);
         $response
@@ -299,7 +299,7 @@ class RedirectLoopDetectorTest extends TestCase
         return $response;
     }
 
-    private function createRequest(string $method, string $url): RequestInterface
+    private static function createRequest(string $method, string $url): RequestInterface
     {
         $uri = \Mockery::mock(UriInterface::class);
         $uri

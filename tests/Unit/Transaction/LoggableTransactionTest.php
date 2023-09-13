@@ -27,7 +27,7 @@ class LoggableTransactionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function jsonSerializeDataProvider(): array
+    public static function jsonSerializeDataProvider(): array
     {
         $request = new Request('GET', 'http://example.com/request_one');
         $response = new Response();
@@ -65,7 +65,7 @@ class LoggableTransactionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function fromJsonDataProvider(): array
+    public static function fromJsonDataProvider(): array
     {
         $request = new Request('GET', 'http://example.com/request_one');
         $response = new Response();

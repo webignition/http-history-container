@@ -44,7 +44,7 @@ class PeriodCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function populateDataProvider(): array
+    public static function populateDataProvider(): array
     {
         return [
             'default' => [

@@ -34,7 +34,7 @@ class ContainerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function invalidOffsetDataProvider(): array
+    public static function invalidOffsetDataProvider(): array
     {
         return [
             'bool' => [
@@ -78,7 +78,7 @@ class ContainerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function offsetDataProvider(): array
+    public static function offsetDataProvider(): array
     {
         $httpTransaction0Data = [
             HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -102,16 +102,16 @@ class ContainerTest extends TestCase
             'no existing transactions' => [
                 'container' => new Container(),
                 'transactionData' => $httpTransaction0Data,
-                'expectedTransactions' => $this->createHttpTransactionCollection([
+                'expectedTransactions' => self::createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                 ]),
             ],
             'has existing transaction' => [
-                'container' => $this->createContainer([
+                'container' => self::createContainer([
                     $httpTransaction0Data
                 ]),
                 'transactionData' => $httpTransaction1Data,
-                'expectedTransactions' => $this->createHttpTransactionCollection([
+                'expectedTransactions' => self::createHttpTransactionCollection([
                     HttpTransaction::fromArray($httpTransaction0Data),
                     HttpTransaction::fromArray($httpTransaction1Data),
                 ]),
@@ -121,7 +121,7 @@ class ContainerTest extends TestCase
 
     public function testOffsetGetOffsetNull(): void
     {
-        $container = $this->createContainer([
+        $container = self::createContainer([
             [
                 HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
                 HttpTransaction::KEY_RESPONSE => \Mockery::mock(ResponseInterface::class),
@@ -146,7 +146,7 @@ class ContainerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function arrayAccessOffsetSetOffsetGetDataProvider(): array
+    public static function arrayAccessOffsetSetOffsetGetDataProvider(): array
     {
         $httpTransaction0Data = [
             HttpTransaction::KEY_REQUEST => \Mockery::mock(RequestInterface::class),
@@ -178,7 +178,7 @@ class ContainerTest extends TestCase
                 'expectedHttpTransaction' => null,
             ],
             'has existing transactions; offset=0' => [
-                'container' => $this->createContainer([
+                'container' => self::createContainer([
                     $httpTransaction0Data,
                     $httpTransaction1Data,
                 ]),
@@ -186,7 +186,7 @@ class ContainerTest extends TestCase
                 'expectedHttpTransaction' => HttpTransaction::fromArray($httpTransaction0Data),
             ],
             'has existing transactions; offset=1' => [
-                'container' => $this->createContainer([
+                'container' => self::createContainer([
                     $httpTransaction0Data,
                     $httpTransaction1Data,
                 ]),
@@ -286,7 +286,7 @@ class ContainerTest extends TestCase
     /**
      * @param HttpTransaction[] $transactions
      */
-    private function createHttpTransactionCollection(array $transactions): HttpTransactionCollection
+    private static function createHttpTransactionCollection(array $transactions): HttpTransactionCollection
     {
         $collection = new HttpTransactionCollection();
 
@@ -300,7 +300,7 @@ class ContainerTest extends TestCase
     /**
      * @param array<mixed> $transactionDataSets
      */
-    private function createContainer(array $transactionDataSets): Container
+    private static function createContainer(array $transactionDataSets): Container
     {
         $container = new Container();
 

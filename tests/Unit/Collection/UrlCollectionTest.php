@@ -39,7 +39,7 @@ class UrlCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function countableDataProvider(): array
+    public static function countableDataProvider(): array
     {
         return [
             'empty' => [
@@ -74,7 +74,7 @@ class UrlCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getLastDataProvider(): array
+    public static function getLastDataProvider(): array
     {
         $firstUrl = \Mockery::mock(UriInterface::class);
         $lastUrl = \Mockery::mock(UriInterface::class);

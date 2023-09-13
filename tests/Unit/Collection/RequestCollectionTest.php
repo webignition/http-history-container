@@ -41,7 +41,7 @@ class RequestCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function countableDataProvider(): array
+    public static function countableDataProvider(): array
     {
         return [
             'empty' => [
@@ -76,7 +76,7 @@ class RequestCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getLastDataProvider(): array
+    public static function getLastDataProvider(): array
     {
         $firstRequest = \Mockery::mock(RequestInterface::class);
         $lastRequest = \Mockery::mock(RequestInterface::class);
@@ -114,7 +114,7 @@ class RequestCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getUrlsDataProvider(): array
+    public static function getUrlsDataProvider(): array
     {
         $firstUri = \Mockery::mock(UriInterface::class);
         $firstRequest = \Mockery::mock(RequestInterface::class);

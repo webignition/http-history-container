@@ -111,7 +111,7 @@ class LoggableContainerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function logTransactionsDataProvider(): array
+    public static function logTransactionsDataProvider(): array
     {
         $encodedJsonBody = (string) json_encode(
             [
