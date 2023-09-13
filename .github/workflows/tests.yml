@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup php
         uses: shivammathur/setup-php@v2
