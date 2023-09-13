@@ -39,7 +39,7 @@ class ResponseCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function countableDataProvider(): array
+    public static function countableDataProvider(): array
     {
         return [
             'empty' => [
@@ -74,7 +74,7 @@ class ResponseCollectionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getLastDataProvider(): array
+    public static function getLastDataProvider(): array
     {
         $firstRequest = \Mockery::mock(ResponseInterface::class);
         $lastRequest = \Mockery::mock(ResponseInterface::class);

@@ -31,7 +31,7 @@ class HttpTransactionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function createDataProvider(): array
+    public static function createDataProvider(): array
     {
         return [
             'response set' => [
@@ -72,7 +72,7 @@ class HttpTransactionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function createFromArrayThrowsExceptionDataProvider(): array
+    public static function createFromArrayThrowsExceptionDataProvider(): array
     {
         $validRequest = \Mockery::mock(RequestInterface::class);
         $validResponse = \Mockery::mock(ResponseInterface::class);
