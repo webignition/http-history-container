@@ -12,12 +12,10 @@ class LoggableRequestFactory
     public const KEY_METHOD = 'method';
     public const KEY_URI = 'uri';
 
-    public const KEY_HEADERS = 'headers';
     public const KEY_BODY = 'body';
 
     private const DEFAULT_EMPTY_METHOD = '';
     private const DEFAULT_EMPTY_URI = '';
-    private const DEFAULT_EMPTY_HEADERS = [];
     private const DEFAULT_EMPTY_BODY = '';
 
     public static function createFromJson(string $request): LoggableRequest
@@ -44,48 +42,9 @@ class LoggableRequestFactory
             new Request(
                 $method,
                 $uriString,
-                self::extractHeaderData($data),
+                HeaderExtractor::extract($data),
                 $body
             )
         );
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return array<array<string>|string>
-     */
-    private static function extractHeaderData(array $data): array
-    {
-        $headers = $data[self::KEY_HEADERS] ?? self::DEFAULT_EMPTY_HEADERS;
-        if (!is_array($headers)) {
-            return self::DEFAULT_EMPTY_HEADERS;
-        }
-
-        $filteredHeaders = self::extractStringValues($headers);
-
-        foreach ($headers as $key => $header) {
-            if (is_array($header)) {
-                $headerStringValues = self::extractStringValues($header);
-
-                if ([] !== $headerStringValues) {
-                    $filteredHeaders[$key] = $headerStringValues;
-                }
-            }
-        }
-
-        return $filteredHeaders;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return array<string>
-     */
-    private static function extractStringValues(array $data): array
-    {
-        return array_filter($data, function ($value) {
-            return is_string($value);
-        });
     }
 }
