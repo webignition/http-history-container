@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
-use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 
 class RedirectLoopDetector
@@ -47,12 +46,10 @@ class RedirectLoopDetector
     private function containsAnyNonRedirectResponses(): bool
     {
         foreach ($this->transactions->getResponses() as $response) {
-            if ($response instanceof ResponseInterface) {
-                $statusCode = $response->getStatusCode();
+            $statusCode = $response->getStatusCode();
 
-                if ($statusCode <= 300 || $statusCode >= 400) {
-                    return true;
-                }
+            if ($statusCode <= 300 || $statusCode >= 400) {
+                return true;
             }
         }
 
