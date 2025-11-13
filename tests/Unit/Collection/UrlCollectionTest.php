@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit\Collection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
 use webignition\HttpHistoryContainer\Collection\UrlCollection;
@@ -27,9 +28,7 @@ class UrlCollectionTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider countableDataProvider
-     */
+    #[DataProvider('countableDataProvider')]
     public function testCountable(UrlCollection $collection, int $expectedCount): void
     {
         self::assertInstanceOf(\Countable::class, $collection);
@@ -63,9 +62,7 @@ class UrlCollectionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getLastDataProvider
-     */
+    #[DataProvider('getLastDataProvider')]
     public function testGetLast(UrlCollection $collection, ?UriInterface $expectedLast): void
     {
         self::assertSame($expectedLast, $collection->getLast());

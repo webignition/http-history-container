@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,12 +17,8 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class ContainerTest extends TestCase
 {
-    /**
-     * @dataProvider invalidOffsetDataProvider
-     *
-     * @param mixed $offset
-     */
-    public function testOffsetSetInvalidOffset($offset): void
+    #[DataProvider('invalidOffsetDataProvider')]
+    public function testOffsetSetInvalidOffset(mixed $offset): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(Container::OFFSET_INVALID_MESSAGE);
@@ -57,10 +54,9 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @dataProvider offsetDataProvider
-     *
      * @param array<mixed> $transactionData
      */
+    #[DataProvider('offsetDataProvider')]
     public function testOffsetSet(
         Container $container,
         array $transactionData,
@@ -132,9 +128,7 @@ class ContainerTest extends TestCase
         self::assertNull($container->offsetGet(null));
     }
 
-    /**
-     * @dataProvider arrayAccessOffsetSetOffsetGetDataProvider
-     */
+    #[DataProvider('arrayAccessOffsetSetOffsetGetDataProvider')]
     public function testOffsetGet(
         Container $container,
         int $offset,

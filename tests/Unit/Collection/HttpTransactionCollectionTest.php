@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit\Collection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -154,10 +155,9 @@ class HttpTransactionCollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider getPeriodsDataProvider
-     *
      * @param HttpTransactionInterface[] $transactions
      */
+    #[DataProvider('getPeriodsDataProvider')]
     public function testGetPeriods(array $transactions, callable $assertions): void
     {
         foreach ($transactions as $transaction) {
@@ -202,9 +202,7 @@ class HttpTransactionCollectionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sliceDataProvider
-     */
+    #[DataProvider('sliceDataProvider')]
     public function testSlice(
         HttpTransactionCollectionInterface $collection,
         int $offset,

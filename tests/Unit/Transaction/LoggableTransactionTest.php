@@ -6,6 +6,7 @@ namespace webignition\HttpHistoryContainer\Tests\Unit\Transaction;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use webignition\HttpHistoryContainer\Message\LoggableRequest;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
@@ -15,10 +16,9 @@ use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 class LoggableTransactionTest extends TestCase
 {
     /**
-     * @dataProvider jsonSerializeDataProvider
-     *
      * @param array<mixed> $expectedSerializedData
      */
+    #[DataProvider('jsonSerializeDataProvider')]
     public function testJsonSerialize(LoggableTransaction $transaction, array $expectedSerializedData): void
     {
         self::assertEquals($expectedSerializedData, $transaction->jsonSerialize());
@@ -52,9 +52,7 @@ class LoggableTransactionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromJsonDataProvider
-     */
+    #[DataProvider('fromJsonDataProvider')]
     public function testFromJson(string $serializedTransaction, LoggableTransaction $expectedLoggableTransaction): void
     {
         $loggableTransaction = LoggableTransaction::fromJson($serializedTransaction);
@@ -77,7 +75,7 @@ class LoggableTransactionTest extends TestCase
                     'response' => new LoggableResponse($response),
                     'period' => 200,
                 ]),
-                'transaction' => new LoggableTransaction(
+                'expectedLoggableTransaction' => new LoggableTransaction(
                     new HttpTransaction(
                         new Request('GET', 'http://example.com/request_one'),
                         new Response(),
