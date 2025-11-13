@@ -52,7 +52,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpunit/phpunit": "^11",
+        "phpunit/phpunit": "^12",
         "squizlabs/php_codesniffer": "^4.0",
         "webignition/object-reflector": "^1.0"
     },
