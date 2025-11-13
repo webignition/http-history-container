@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Factory;
 
-class HeaderExtractor
+class MessageComponentExtractor
 {
     /**
      * @param array<mixed> $data
      *
      * @return array<array<string>|string>
      */
-    public static function extract(array $data): array
+    public static function extractHeaders(array $data): array
     {
         $headers = $data['headers'] ?? [];
         if (!is_array($headers)) {
@@ -31,6 +31,19 @@ class HeaderExtractor
         }
 
         return $filteredHeaders;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public static function extractBody(array $data): string
+    {
+        $body = $data['body'] ?? '';
+        if (!is_string($body)) {
+            $body = '';
+        }
+
+        return $body;
     }
 
     /**

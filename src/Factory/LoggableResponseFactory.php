@@ -11,10 +11,7 @@ class LoggableResponseFactory
 {
     public const KEY_STATUS_CODE = 'status_code';
 
-    public const KEY_BODY = 'body';
-
     private const DEFAULT_EMPTY_STATUS_CODE = 0;
-    private const DEFAULT_EMPTY_BODY = '';
 
     public static function createFromJson(string $request): LoggableResponse
     {
@@ -26,16 +23,11 @@ class LoggableResponseFactory
             $statusCode = self::DEFAULT_EMPTY_STATUS_CODE;
         }
 
-        $body = $data[self::KEY_BODY] ?? self::DEFAULT_EMPTY_BODY;
-        if (!is_string($body)) {
-            $body = self::DEFAULT_EMPTY_BODY;
-        }
-
         return new LoggableResponse(
             new Response(
                 $statusCode,
-                HeaderExtractor::extract($data),
-                $body
+                MessageComponentExtractor::extractHeaders($data),
+                MessageComponentExtractor::extractBody($data),
             )
         );
     }
