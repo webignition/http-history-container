@@ -20,8 +20,6 @@ class UrlCollectionTest extends TestCase
         ];
 
         $collection = new UrlCollection($urls);
-        self::assertInstanceOf(\Traversable::class, $collection);
-        self::assertIsIterable($collection);
 
         foreach ($collection as $urlIndex => $url) {
             self::assertSame($urls[$urlIndex], $url);
@@ -31,7 +29,6 @@ class UrlCollectionTest extends TestCase
     #[DataProvider('countableDataProvider')]
     public function testCountable(UrlCollection $collection, int $expectedCount): void
     {
-        self::assertInstanceOf(\Countable::class, $collection);
         self::assertCount($expectedCount, $collection);
     }
 

@@ -22,8 +22,6 @@ class RequestCollectionTest extends TestCase
         ];
 
         $collection = new RequestCollection($requests);
-        self::assertInstanceOf(\Traversable::class, $collection);
-        self::assertIsIterable($collection);
 
         foreach ($collection as $requestIndex => $request) {
             self::assertSame($requests[$requestIndex], $request);
@@ -33,7 +31,6 @@ class RequestCollectionTest extends TestCase
     #[DataProvider('countableDataProvider')]
     public function testCountable(RequestCollection $collection, int $expectedCount): void
     {
-        self::assertInstanceOf(\Countable::class, $collection);
         self::assertCount($expectedCount, $collection);
     }
 
