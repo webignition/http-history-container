@@ -9,25 +9,19 @@ use webignition\HttpHistoryContainer\Message\LoggableRequest;
 
 class LoggableRequestFactory
 {
-    public const KEY_METHOD = 'method';
-    public const KEY_URI = 'uri';
-
-    private const DEFAULT_EMPTY_METHOD = '';
-    private const DEFAULT_EMPTY_URI = '';
-
     public static function createFromJson(string $request): LoggableRequest
     {
         $data = json_decode($request, true);
         $data = is_array($data) ? $data : [];
 
-        $method = $data[self::KEY_METHOD] ?? self::DEFAULT_EMPTY_METHOD;
+        $method = $data['method'] ?? '';
         if (!is_string($method)) {
-            $method = self::DEFAULT_EMPTY_METHOD;
+            $method = '';
         }
 
-        $uriString = $data[self::KEY_URI] ?? self::DEFAULT_EMPTY_URI;
+        $uriString = $data['uri'] ?? '';
         if (!is_string($uriString)) {
-            $uriString = self::DEFAULT_EMPTY_URI;
+            $uriString = '';
         }
 
         return new LoggableRequest(
