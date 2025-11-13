@@ -12,8 +12,8 @@ class InvalidTransactionException extends \Exception
     public const VALUE_REQUEST_NOT_REQUEST_MESSAGE = 'data[\'request\'] must implement ' . RequestInterface::class;
     public const VALUE_REQUEST_NOT_REQUEST_CODE = 1;
 
-    public const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE =
-        'data[\'response\'] must be null or implement ' . ResponseInterface::class;
+    public const VALUE_RESPONSE_NOT_RESPONSE_MESSAGE
+        = 'data[\'response\'] must be null or implement ' . ResponseInterface::class;
     public const VALUE_RESPONSE_NOT_RESPONSE_CODE = 2;
 
     /**
