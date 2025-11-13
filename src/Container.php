@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Promise\RejectedPromise;
-use Psr\Http\Message\RequestInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
@@ -33,8 +30,8 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * @param null|mixed $offset
-     * @param mixed|array<mixed> $value
+     * @param null|mixed         $offset
+     * @param array<mixed>|mixed $value
      *
      * @throws InvalidTransactionException
      */
