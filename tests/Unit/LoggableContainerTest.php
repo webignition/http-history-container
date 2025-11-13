@@ -12,7 +12,6 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use webignition\HttpHistoryContainer\LoggableContainer;
-use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
 
 class LoggableContainerTest extends TestCase
 {
@@ -72,11 +71,11 @@ class LoggableContainerTest extends TestCase
         $lastPeriod = null;
         foreach ($decodedMessages as $decodedMessage) {
             self::assertIsArray($decodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $decodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_RESPONSE, $decodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_PERIOD, $decodedMessage);
+            self::assertArrayHasKey('request', $decodedMessage);
+            self::assertArrayHasKey('response', $decodedMessage);
+            self::assertArrayHasKey('period', $decodedMessage);
 
-            $period = $decodedMessage[LoggableTransaction::KEY_PERIOD];
+            $period = $decodedMessage['period'];
 
             if (null === $lastPeriod) {
                 self::assertSame(0, $period);
@@ -89,21 +88,21 @@ class LoggableContainerTest extends TestCase
 
         foreach ($expectedDecodedMessages as $messageIndex => $expectedDecodedMessage) {
             self::assertIsArray($expectedDecodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $expectedDecodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_RESPONSE, $expectedDecodedMessage);
+            self::assertArrayHasKey('request', $expectedDecodedMessage);
+            self::assertArrayHasKey('response', $expectedDecodedMessage);
 
             $decodedMessage = $decodedMessages[$messageIndex];
             self::assertIsArray($decodedMessage);
-            self::assertArrayHasKey(LoggableTransaction::KEY_REQUEST, $decodedMessage);
+            self::assertArrayHasKey('request', $decodedMessage);
 
             self::assertEquals(
-                $expectedDecodedMessage[LoggableTransaction::KEY_REQUEST],
-                $decodedMessage[LoggableTransaction::KEY_REQUEST]
+                $expectedDecodedMessage['request'],
+                $decodedMessage['request']
             );
 
             self::assertEquals(
-                $expectedDecodedMessage[LoggableTransaction::KEY_RESPONSE],
-                $decodedMessage[LoggableTransaction::KEY_RESPONSE]
+                $expectedDecodedMessage['response'],
+                $decodedMessage['response']
             );
         }
     }
