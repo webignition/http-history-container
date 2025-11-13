@@ -9,7 +9,7 @@ use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 /**
- * @implements \ArrayAccess<int, mixed>
+ * @implements \ArrayAccess<int, array>
  * @implements \IteratorAggregate<HttpTransactionInterface>
  */
 class Container implements \ArrayAccess, \IteratorAggregate, \Countable
@@ -30,7 +30,8 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * @param null|mixed $offset
+     * @param null|mixed         $offset
+     * @param array<mixed>|mixed $value
      *
      * @throws InvalidTransactionException
      */
