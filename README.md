@@ -126,7 +126,7 @@ instance you like.
 The logging container wraps each `HttpTransaction` in a `LoggableTransaction` object which is
 serialized to JSON and output as a debug message.
 
-`LoggableTransaction::fromJson()` lets you (in a somewhat slightly lossy manner) re-create 
+`LoggableTransactionFactory::createFromJson()` lets you (in a somewhat slightly lossy manner) re-create 
 transactions object from logged messages.`
 
 ### Logging Example
@@ -138,7 +138,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use webignition\HttpHistoryContainer\LoggableContainer;
-use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
+use webignition\HttpHistoryContainer\Factory\LoggableTransactionFactory;
 
 // Create the PSR logger
 $path = '/path/to/log';
@@ -161,7 +161,7 @@ $logLines = array_filter(explode("\n", $logContent));
 
 $loggedTransactions = [];
 foreach ($logLines as $logLine) {
-    $loggedTransactions[] = LoggableTransaction::fromJson($logLine);
+    $loggedTransactions[] = LoggableTransactionFactory::createFromJson($logLine);
 }
 
 // $loggedTransactions is now an array of LoggableTransaction
