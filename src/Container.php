@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer;
 
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
+use Psr\Http\Message\RequestInterface;
 use webignition\HttpHistoryContainer\Collection\HttpTransactionCollection;
 use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 /**
- * @implements \ArrayAccess<int, mixed>
+ * @implements \ArrayAccess<int, array>
  * @implements \IteratorAggregate<HttpTransactionInterface>
  */
 class Container implements \ArrayAccess, \IteratorAggregate, \Countable
