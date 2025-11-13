@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace webignition\HttpHistoryContainer\Tests\Unit\Message;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
@@ -12,10 +13,9 @@ use webignition\HttpHistoryContainer\Message\LoggableResponse;
 class LoggableResponseTest extends TestCase
 {
     /**
-     * @dataProvider jsonSerializeDataProvider
-     *
      * @param array<mixed> $expectedSerializedData
      */
+    #[DataProvider('jsonSerializeDataProvider')]
     public function testJsonSerialize(LoggableResponse $response, array $expectedSerializedData): void
     {
         self::assertSame($expectedSerializedData, $response->jsonSerialize());
@@ -75,9 +75,7 @@ class LoggableResponseTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider createFromJsonDataProvider
-     */
+    #[DataProvider('createFromJsonDataProvider')]
     public function testCreateFromJson(string $serializedResponse, LoggableResponse $expectedLoggableResponse): void
     {
         $loggableResponse = LoggableResponse::fromJson($serializedResponse);

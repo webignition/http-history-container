@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit\Collection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Collection\ResponseCollection;
@@ -27,9 +28,7 @@ class ResponseCollectionTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider countableDataProvider
-     */
+    #[DataProvider('countableDataProvider')]
     public function testCountable(ResponseCollection $collection, int $expectedCount): void
     {
         self::assertInstanceOf(\Countable::class, $collection);
@@ -63,9 +62,7 @@ class ResponseCollectionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getLastDataProvider
-     */
+    #[DataProvider('getLastDataProvider')]
     public function testGetLast(ResponseCollection $collection, ?ResponseInterface $expectedLast): void
     {
         self::assertSame($expectedLast, $collection->getLast());

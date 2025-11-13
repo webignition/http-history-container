@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,9 +16,7 @@ use webignition\HttpHistoryContainer\Transaction\HttpTransactionInterface;
 
 class RedirectLoopDetectorTest extends TestCase
 {
-    /**
-     * @dataProvider hasRedirectLoopDataProvider
-     */
+    #[DataProvider('hasRedirectLoopDataProvider')]
     public function testHasRedirectLoop(RedirectLoopDetector $redirectLoopDetector, bool $expectedHasRedirectLoop): void
     {
         $this->assertEquals($expectedHasRedirectLoop, $redirectLoopDetector->hasRedirectLoop());

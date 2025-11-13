@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit\Transaction;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -13,11 +14,10 @@ use webignition\HttpHistoryContainer\Transaction\HttpTransaction;
 class HttpTransactionTest extends TestCase
 {
     /**
-     * @dataProvider createDataProvider
-     *
      * @param mixed        $error
      * @param array<mixed> $options
      */
+    #[DataProvider('createDataProvider')]
     public function testCreate(RequestInterface $request, ?ResponseInterface $response, $error, array $options): void
     {
         $transaction = new HttpTransaction($request, $response, $error, $options);
@@ -56,10 +56,9 @@ class HttpTransactionTest extends TestCase
     }
 
     /**
-     * @dataProvider createFromArrayThrowsExceptionDataProvider
-     *
      * @param array<mixed> $data
      */
+    #[DataProvider('createFromArrayThrowsExceptionDataProvider')]
     public function testCreateFromArrayThrowsException(
         array $data,
         InvalidTransactionException $expectedException

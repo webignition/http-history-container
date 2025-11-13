@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use webignition\HttpHistoryContainer\LoggableContainer;
 use webignition\HttpHistoryContainer\Transaction\LoggableTransaction;
@@ -44,11 +45,10 @@ class LoggableContainerTest extends TestCase
     }
 
     /**
-     * @dataProvider logTransactionsDataProvider
-     *
      * @param array<mixed> $transactions
      * @param array<mixed> $expectedDecodedMessages
      */
+    #[DataProvider('logTransactionsDataProvider')]
     public function testLogTransactions(array $transactions, array $expectedDecodedMessages): void
     {
         foreach ($transactions as $transaction) {

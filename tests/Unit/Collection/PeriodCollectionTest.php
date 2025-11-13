@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace webignition\HttpHistoryContainer\Tests\Unit\Collection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use webignition\HttpHistoryContainer\Collection\PeriodCollection;
 use webignition\HttpHistoryContainer\Tests\Model\PeriodCollectionTest\PeriodRange;
@@ -11,11 +12,10 @@ use webignition\HttpHistoryContainer\Tests\Model\PeriodCollectionTest\PeriodRang
 class PeriodCollectionTest extends TestCase
 {
     /**
-     * @dataProvider populateDataProvider
-     *
      * @param int[]         $addCallDelays
      * @param PeriodRange[] $expectedPeriodRanges
      */
+    #[DataProvider('populateDataProvider')]
     public function testPopulate(array $addCallDelays, array $expectedPeriodRanges): void
     {
         $collection = new PeriodCollection();
