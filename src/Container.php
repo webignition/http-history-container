@@ -34,6 +34,7 @@ class Container implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * @param null|mixed $offset
+     * @param mixed|array<mixed> $value
      *
      * @throws InvalidTransactionException
      */
