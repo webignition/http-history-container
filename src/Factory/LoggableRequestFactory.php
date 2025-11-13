@@ -14,20 +14,10 @@ class LoggableRequestFactory
         $data = json_decode($request, true);
         $data = is_array($data) ? $data : [];
 
-        $method = $data['method'] ?? '';
-        if (!is_string($method)) {
-            $method = '';
-        }
-
-        $uriString = $data['uri'] ?? '';
-        if (!is_string($uriString)) {
-            $uriString = '';
-        }
-
         return new LoggableRequest(
             new Request(
-                $method,
-                $uriString,
+                MessageComponentExtractor::extractStringComponent('method', $data),
+                MessageComponentExtractor::extractStringComponent('uri', $data),
                 MessageComponentExtractor::extractHeaders($data),
                 MessageComponentExtractor::extractBody($data),
             )

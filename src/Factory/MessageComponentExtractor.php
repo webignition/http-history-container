@@ -48,6 +48,16 @@ class MessageComponentExtractor
 
     /**
      * @param array<mixed> $data
+     */
+    public static function extractStringComponent(string $key, array $data): string
+    {
+        $value = $data[$key] ?? '';
+
+        return is_string($value) ? $value : '';
+    }
+
+    /**
+     * @param array<mixed> $data
      *
      * @return array<string>
      */
