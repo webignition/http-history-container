@@ -6,6 +6,7 @@ namespace webignition\HttpHistoryContainer\Transaction;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use webignition\HttpHistoryContainer\Factory\LoggableRequestFactory;
 use webignition\HttpHistoryContainer\Message\LoggableRequest;
 use webignition\HttpHistoryContainer\Message\LoggableResponse;
 
@@ -37,7 +38,7 @@ class LoggableTransaction implements \JsonSerializable, HttpTransactionInterface
             $responseData = self::DEFAULT_EMPTY_RESPONSE_DATA;
         }
 
-        $loggableRequest = LoggableRequest::fromJson((string) json_encode($requestData));
+        $loggableRequest = LoggableRequestFactory::createFromJson((string) json_encode($requestData));
         $loggableResponse = LoggableResponse::fromJson((string) json_encode($responseData));
         $period = (int) ($data[self::KEY_PERIOD] ?? 0);
 
